@@ -76,6 +76,10 @@ sysbench.cmdline.options = {
           "delete_inserts is set to 0"}
 }
 
+if (sysbench.sql.driver():name() == "tarantool") then
+   sysbench.cmdline.options.auto_inc[2] = false
+end
+
 -- Prepare the dataset. This command supports parallel execution, i.e. will
 -- benefit from executing with --threads > 1 as long as --tables > 1
 function cmd_prepare()
@@ -180,6 +184,8 @@ function create_table(drv, con, table_num)
       else
         id_def = "SERIAL"
       end
+   elseif drv:name() == "tarantool" then
+      id_def = "INTEGER NOT NULL"
    else
       error("Unsupported database driver:" .. drv:name())
    end
