@@ -32,7 +32,12 @@ function event()
    local c_val = get_c_value()
    local pad_val = get_pad_value()
 
-   if (drv:name() == "pgsql" and sysbench.opt.auto_inc) then
+   if (drv:name() == "tarantool") then
+      i = sysbench.rand.unique() - 2147483648
+      con:query(string.format("INSERT OR IGNORE INTO %s (id, k, c, pad) VALUES " ..
+                                 "(%d, %d, '%s', '%s')",
+                              table_name, i, k_val, c_val, pad_val))
+   elseif (drv:name() == "pgsql" and sysbench.opt.auto_inc) then
       con:query(string.format("INSERT INTO %s (k, c, pad) VALUES " ..
                                  "(%d, '%s', '%s')",
                               table_name, k_val, c_val, pad_val))
