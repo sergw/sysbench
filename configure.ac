@@ -170,6 +170,17 @@ AS_IF([test "x$with_pgsql" != "xno"],
    [pgsql_support=no])
 AC_MSG_RESULT([$pgsql_support])
 
+# Check if we should compile with Tarantool support
+AC_ARG_WITH([tarantool],
+            AS_HELP_STRING([--with-tarantool],
+                           [compile with Tarantool support (default is disabled)]),
+            [], [with_tarantool=no])
+AC_MSG_CHECKING([whether to compile with Tarantool support])
+AS_IF([test "x$with_tarantool" != "xno"],
+   [tarantool_support=yes],
+   [tarantool_support=no])
+AC_MSG_RESULT([$tarantool_support])
+
 # Set LuaJIT flags
 SB_LUAJIT
 
@@ -272,6 +283,15 @@ AS_IF([test x$with_pgsql != xno], [
 ])
 AM_CONDITIONAL(USE_PGSQL, test x$with_pgsql != xno)
 AC_SUBST([USE_PGSQL])
+
+AS_IF([test x$with_tarantool != xno], [
+    USE_TARANTOOL=1
+    AC_DEFINE(USE_TARANTOOL,1,[Define to 1 if you want to compile with Tarantool support])
+    AC_SUBST([TARANTOOL_LIBS])
+    AC_SUBST([TARANTOOL_CFLAGS])
+])
+AM_CONDITIONAL(USE_TARANTOOL, test x$with_tarantool != xno)
+AC_SUBST([USE_TARANTOOL])
 
 # Check for libaio
 AC_CHECK_AIO
@@ -548,6 +568,7 @@ src/drivers/mysql/Makefile
 src/drivers/drizzle/Makefile
 src/drivers/oracle/Makefile
 src/drivers/pgsql/Makefile
+src/drivers/tarantool/Makefile
 src/drivers/attachsql/Makefile
 src/tests/Makefile
 src/tests/cpu/Makefile
@@ -583,6 +604,7 @@ AC_MSG_RESULT([Drizzle support    : ${drizzle_support}])
 AC_MSG_RESULT([AttachSQL support  : ${attachsql_support}])
 AC_MSG_RESULT([Oracle support     : ${oracle_support}])
 AC_MSG_RESULT([PostgreSQL support : ${pgsql_support}])
+AC_MSG_RESULT([Tarantool support  : ${tarantool_support}])
 AC_MSG_RESULT([])
 AC_MSG_RESULT([LuaJIT             : ${sb_use_luajit}])
 AC_MSG_RESULT([LUAJIT_CFLAGS      : ${LUAJIT_CFLAGS}])

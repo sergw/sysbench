@@ -97,6 +97,9 @@ int db_register(void)
 #ifdef USE_MYSQL
   register_driver_mysql(&drivers);
 #endif
+#ifdef USE_TARANTOOL
+  register_driver_tarantool(&drivers);
+#endif
 #ifdef USE_DRIZZLE
   register_driver_drizzle(&drivers);
 #endif

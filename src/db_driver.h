@@ -323,6 +323,10 @@ void db_report_cumulative(sb_stat_t *);
 int register_driver_mysql(sb_list_t *);
 #endif
 
+#ifdef USE_TARANTOOL
+int register_driver_tarantool(sb_list_t *);
+#endif
+
 #ifdef USE_DRIZZLE
 int register_driver_drizzle(sb_list_t *);
 #endif
