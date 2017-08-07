@@ -25,6 +25,8 @@
 #include <tarantool/tnt_net.h>
 #include <tarantool/tnt_opt.h>
 
+#define xfree(ptr) ({ if (ptr) free((void *)ptr); ptr = NULL; })
+
 /* Tarantool driver arguments */
 
 static sb_arg_t tarantool_drv_args[] =
@@ -68,7 +70,6 @@ static drv_caps_t tarantool_drv_caps =
 
 static tarantool_drv_args_t args;          /* driver args */
 
-static char use_ps; /* whether server-side prepared statemens should be used */
 
 /* Positions in the list of hosts/ports/sockets. Protected by pos_mutex */
 //...
@@ -81,7 +82,10 @@ static int tarantool_drv_connect(db_conn_t *);
 static int tarantool_drv_disconnect(db_conn_t *);
 static db_error_t tarantool_drv_query(db_conn_t *, const char *, size_t, db_result_t *);
 static int tarantool_drv_done(void);
-
+static int tarantool_drv_prepare(db_stmt_t *, const char *, size_t);
+static int tarantool_drv_bind_param(db_stmt_t *, db_bind_t *, size_t);
+static db_error_t tarantool_drv_execute(db_stmt_t *, db_result_t *);
+static int tarantool_drv_close(db_stmt_t *);
 
 /* Tarantool driver definition */
 
@@ -97,6 +101,11 @@ static db_driver_t tarantool_driver =
     .disconnect = tarantool_drv_disconnect,
     .done = tarantool_drv_done,
     .describe = tarantool_drv_describe,
+    .prepare = tarantool_drv_prepare,
+    .bind_param = tarantool_drv_bind_param,
+    .execute = tarantool_drv_execute,
+    .close = tarantool_drv_close,
+
   }
 };
 
@@ -203,10 +212,116 @@ int tarantool_drv_done(void)
 }
 
 /* Describe database capabilities */
-
 int tarantool_drv_describe(drv_caps_t *caps)
 {
+  log_text(LOG_DEBUG, "tarantool_drv_describe\n");
   *caps = tarantool_drv_caps;
+  return 0;
+}
+
+/* Prepare statement */
+int tarantool_drv_prepare(db_stmt_t *stmt, const char *query, size_t len)
+{
+  log_text(LOG_DEBUG, "tarantool_drv_prepare: %s\n", query);
+
+  struct tnt_stream * con = stmt->connection->ptr;
+
+  (void) len; /* unused */
+
+  if (con == NULL)
+    return 1;
+
+  /* Use client-side PS */
+  stmt->emulated = 1;
+  stmt->query = strdup(query);
+
+  return 0;
+}
+
+/* Bind parameters for prepared statement */
+int tarantool_drv_bind_param(db_stmt_t *stmt, db_bind_t *params, size_t len)
+{
+  log_text(LOG_DEBUG, "tarantool_drv_bind_param\n");
+
+  if (stmt->bound_param != NULL)
+    free(stmt->bound_param);
+  stmt->bound_param = (db_bind_t *)malloc(len * sizeof(db_bind_t));
+  if (stmt->bound_param == NULL)
+    return 1;
+  memcpy(stmt->bound_param, params, len * sizeof(db_bind_t));
+  stmt->bound_param_len = len;
+
+  if (stmt->emulated) {
+    return 0;
+  }
+
+  return 0;
+}
+
+/* Execute prepared statement */
+db_error_t tarantool_drv_execute(db_stmt_t *stmt, db_result_t *rs)
+{
+  log_text(LOG_DEBUG, "tarantool_drv_execute\n");
+
+  db_conn_t       *con = stmt->connection;
+  char            *buf = NULL;
+  unsigned int    buflen = 0;
+  unsigned int    i, j, vcnt;
+  char            need_realloc;
+  int             n;
+  db_error_t      rc;
+  unsigned long   len;
+
+  con->sql_errno = 0;
+  xfree(con->sql_state);
+  xfree(con->sql_errmsg);
+
+  /* Use emulation */
+  /* Build the actual query string from parameters list */
+  need_realloc = 1;
+  vcnt = 0;
+  for (i = 0, j = 0; stmt->query[i] != '\0'; i++)
+  {
+      again:
+    if (j+1 >= buflen || need_realloc)
+    {
+      buflen = (buflen > 0) ? buflen * 2 : 256;
+      buf = realloc(buf, buflen);
+      if (buf == NULL)
+        return DB_ERROR_FATAL;
+      need_realloc = 0;
+    }
+
+    if (stmt->query[i] != '?')
+    {
+      buf[j++] = stmt->query[i];
+      continue;
+    }
+
+    n = db_print_value(stmt->bound_param + vcnt, buf + j, buflen - j);
+    if (n < 0)
+    {
+      need_realloc = 1;
+      goto again;
+    }
+    j += n;
+    vcnt++;
+  }
+  buf[j] = '\0';
+
+  rc = tarantool_drv_query(con, buf, j, rs);
+
+  free(buf);
+
+  return rc;
+}
+
+/* Close prepared statement */
+int tarantool_drv_close(db_stmt_t *stmt)
+{
+  log_text(LOG_DEBUG, "tarantool_drv_close\n");
+
+  xfree(stmt->ptr);
 
   return 0;
 }
