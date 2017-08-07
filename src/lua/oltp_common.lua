@@ -185,7 +185,7 @@ function create_table(drv, con, table_num)
         id_def = "SERIAL"
       end
    elseif drv:name() == "tarantool" then
-      id_def = "INTEGER NOT NULL"
+      id_def = "INTEGER"
    else
       error("Unsupported database driver:" .. drv:name())
    end

@@ -44,13 +44,17 @@ function event()
    else
       if (sysbench.opt.auto_inc) then
          i = 0
+
+         con:query(string.format("INSERT INTO %s (id, k, c, pad) VALUES " ..
+                                    "(%d, %d, '%s', '%s')",
+                                 table_name, i, k_val, c_val, pad_val))
       else
          -- Convert a uint32_t value to SQL INT
          i = sysbench.rand.unique() - 2147483648
-      end
 
-      con:query(string.format("INSERT INTO %s (id, k, c, pad) VALUES " ..
-                                 "(%d, %d, '%s', '%s')",
-                              table_name, i, k_val, c_val, pad_val))
+         con:query(string.format("INSERT IGNORE INTO %s (id, k, c, pad) VALUES " ..
+                                    "(%d, %d, '%s', '%s')",
+                                 table_name, i, k_val, c_val, pad_val))
+      end
    end
 end
