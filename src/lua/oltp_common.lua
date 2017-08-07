@@ -78,6 +78,7 @@ sysbench.cmdline.options = {
 
 if (sysbench.sql.driver():name() == "tarantool") then
    sysbench.cmdline.options.auto_inc[2] = false
+   sysbench.cmdline.options.skip_trx[2] = true
 end
 
 -- Prepare the dataset. This command supports parallel execution, i.e. will
