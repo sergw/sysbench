@@ -259,6 +259,14 @@ The table below lists the supported common options, their descriptions and defau
 
 Note that numerical values for all *size* options (like `--thread-stack-size` in this table) may be specified by appending the corresponding multiplicative suffix (K for kilobytes, M for megabytes, G for gigabytes and T for terabytes).
 
+## Run the test with different number of threads
+The number of threads: 1, 2, 4, 8, 16, 32, 64, 128, 256, 512  
+
+Examples:  
+
+		  ./threads_steps.sh --dir=/home/ilya/projects/sysbench/ --db=pgsql --test=select_random_points 
+		  
+
 [coveralls-badge]: https://coveralls.io/repos/github/akopytov/sysbench/badge.svg?branch=master
 [coveralls-url]: https://coveralls.io/github/akopytov/sysbench?branch=master
 [travis-badge]: https://travis-ci.org/akopytov/sysbench.svg?branch=master
