@@ -19,6 +19,7 @@ autom4te.cache
 /src/drivers/mysql/.deps
 /src/drivers/oracle/.deps
 /src/drivers/pgsql/.deps
+/src/drivers/tarantool/.deps
 /src/tests/cpu/.deps
 /src/tests/fileio/.deps
 /src/tests/memory/.deps
@@ -86,3 +87,7 @@ prime
 stage
 *.snap
 /snap/snapcraft.yaml
+
+.idea/
+CMakeLists.txt
+cmake-build-debug/
