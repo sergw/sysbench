@@ -129,6 +129,9 @@ After installing WSL and getting into bash prompt on Windows, following
 Debian/Ubuntu build instructions is sufficient. Alternatively, one can
 build and use an older 0.5 release on Windows.
 
+### For tarantool support
+You need Tarantool C client libraries: [repository](https://github.com/tarantool/tarantool-c)
+
 ### Debian/Ubuntu
 ``` shell
     apt -y install make automake libtool pkg-config libaio-dev vim-common
@@ -171,6 +174,7 @@ Assuming you have Xcode (or Xcode Command Line Tools) and Homebrew installed:
 ``` shell
     ./autogen.sh
     # Add --with-pgsql to build with PostgreSQL support
+    # Add --with-tarantool to build with Tarantool support
     ./configure
     make
     make install
