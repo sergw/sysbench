@@ -20,6 +20,7 @@
 
 #include "sb_options.h"
 #include "db_driver.h"
+#include "../../db_driver.h"
 
 #include <tarantool/tarantool.h>
 #include <tarantool/tnt_net.h>
@@ -291,10 +292,6 @@ db_error_t tarantool_drv_execute(db_stmt_t *stmt, db_result_t *rs)
   db_error_t      rc;
   unsigned long   len;
 
-  con->sql_errno = 0;
-  xfree(con->sql_state);
-  xfree(con->sql_errmsg);
-
   /* Build the actual query string from parameters list */
   need_realloc = 1;
   vcnt = 0;
@@ -340,6 +337,7 @@ int tarantool_drv_close(db_stmt_t *stmt)
   log_text(LOG_DEBUG, "tarantool_drv_close\n");
 
   xfree(stmt->ptr);
+  xfree(stmt->query);
 
   return 0;
 }
