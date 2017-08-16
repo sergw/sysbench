@@ -216,7 +216,31 @@ int tarantool_drv_done(void)
 int tarantool_drv_describe(drv_caps_t *caps)
 {
   log_text(LOG_DEBUG, "tarantool_drv_describe\n");
+
   *caps = tarantool_drv_caps;
+
+  const char uri[URI_MAX_LENGTH];
+  strcpy(uri, args.host);
+  strcat(uri, ":");
+  strcat(uri, args.port);
+
+  struct tnt_stream * con = tnt_net(NULL); // Allocating stream
+  tnt_set(con, TNT_OPT_URI, uri); // Setting URI
+  tnt_set(con, TNT_OPT_SEND_BUF, 0); // Disable buffering for send
+  tnt_set(con, TNT_OPT_RECV_BUF, 0); // Disable buffering for recv
+
+  // Initialize stream and connect to Tarantool
+  if (tnt_connect(con) < 0) {
+    log_text(LOG_FATAL, "Connection to database failed");
+    return 1;
+  }
+
+  if (con != NULL) {
+    // Close connection and free stream object
+    tnt_close(con);
+    tnt_stream_free(con);
+  }
+
   return 0;
 }
 
