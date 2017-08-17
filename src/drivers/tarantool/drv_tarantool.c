@@ -30,15 +30,17 @@
 #define xfree(ptr) ({ if (ptr) free((void *)ptr); ptr = NULL; })
 #define URI_MAX_LENGTH 100
 #define MAX_NUMBER_EMPTY_RESULT 5
+#define GUEST_USER "guest"
+#define BOX_SQL_EXECUTE "box.sql.execute"
+
 
 /* Tarantool driver arguments */
 static sb_arg_t tarantool_drv_args[] =
 {
   SB_OPT("tarantool-host", "Tarantool server host", "localhost", STRING),
   SB_OPT("tarantool-port", "Tarantool server port", "3301", INT),
-  SB_OPT("tarantool-user", "Tarantool user", "sbtest", STRING),
+  SB_OPT("tarantool-user", "Tarantool user", GUEST_USER, STRING),
   SB_OPT("tarantool-password", "Tarantool password", "", STRING),
-  SB_OPT("tarantool-db", "Tarantool database name", "sbtest", STRING),
 
   SB_OPT_END
 };
@@ -49,7 +51,6 @@ typedef struct
     char               *port;
     char               *user;
     char               *password;
-    char               *db;
 } tarantool_drv_args_t;
 
 /* Tarantool driver capabilities */
@@ -118,7 +119,6 @@ int tarantool_drv_init(void)
   args.port = sb_get_value_string("tarantool-port");
   args.user = sb_get_value_string("tarantool-user");
   args.password = sb_get_value_string("tarantool-password");
-  args.db = sb_get_value_string("tarantool-db");
 
   return 0;
 }
@@ -126,12 +126,22 @@ int tarantool_drv_init(void)
 /* Connect to database */
 int tarantool_drv_connect(db_conn_t *sb_conn)
 {
-  log_text(LOG_DEBUG, "tarantool_drv_connect\n");
+  log_text(LOG_DEBUG, "tarantool_drv_connect");
 
-  const char uri[URI_MAX_LENGTH];
-  strcpy(uri, args.host);
+  char uri[URI_MAX_LENGTH] = "";
+
+  if (strcmp(args.user, GUEST_USER) && args.password) {
+    strcat(uri, args.user);
+    strcat(uri, ":");
+    strcat(uri, args.password);
+    strcat(uri, "@");
+  }
+
+  strcat(uri, args.host);
   strcat(uri, ":");
   strcat(uri, args.port);
+
+  log_text(LOG_DEBUG, "TNT_OPT_URI = %s", uri);
 
   struct tnt_stream * con = tnt_net(NULL); // Allocating stream
   tnt_set(con, TNT_OPT_URI, uri); // Setting URI
@@ -178,8 +188,7 @@ db_error_t tarantool_drv_query(db_conn_t *sb_conn, const char *query, size_t len
   tnt_object_format(tuple, "[%s]", query);
 
   /*SEND REQUEST*/
-  const char proc[] = "box.sql.execute";
-  tnt_call(con, proc, sizeof(proc) - 1, tuple);
+  tnt_call(con, BOX_SQL_EXECUTE, sizeof(BOX_SQL_EXECUTE) - 1, tuple);
   tnt_flush(con);
 
   tnt_stream_free(tuple);
@@ -220,8 +229,16 @@ int tarantool_drv_describe(drv_caps_t *caps)
 
   *caps = tarantool_drv_caps;
 
-  const char uri[URI_MAX_LENGTH];
-  strcpy(uri, args.host);
+  char uri[URI_MAX_LENGTH] = "";
+
+  if (strcmp(args.user, GUEST_USER) && args.password) {
+    strcat(uri, args.user);
+    strcat(uri, ":");
+    strcat(uri, args.password);
+    strcat(uri, "@");
+  }
+
+  strcat(uri, args.host);
   strcat(uri, ":");
   strcat(uri, args.port);
 
