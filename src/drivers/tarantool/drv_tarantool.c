@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "sb_options.h"
 #include "db_driver.h"
@@ -24,14 +25,10 @@
 
 #include <tarantool/tarantool.h>
 #include <tarantool/tnt_net.h>
-#include <tarantool/tnt_opt.h>
-#include <string.h>
 
 #define xfree(ptr) ({ if (ptr) free((void *)ptr); ptr = NULL; })
 #define URI_MAX_LENGTH 100
-#define MAX_NUMBER_EMPTY_RESULT 5
 #define GUEST_USER "guest"
-#define BOX_SQL_EXECUTE "box.sql.execute"
 
 
 /* Tarantool driver arguments */
@@ -47,10 +44,10 @@ static sb_arg_t tarantool_drv_args[] =
 
 typedef struct
 {
-    char               *host;
-    char               *port;
-    char               *user;
-    char               *password;
+  char  *host;
+  char  *port;
+  char  *user;
+  char  *password;
 } tarantool_drv_args_t;
 
 /* Tarantool driver capabilities */
@@ -64,14 +61,15 @@ static drv_caps_t tarantool_drv_caps =
   .unsigned_int = 0,
 };
 
-static tarantool_drv_args_t args;          /* driver args */
+static tarantool_drv_args_t args;
 
 /* Tarantool driver operations */
 static int tarantool_drv_init(void);
 static int tarantool_drv_describe(drv_caps_t *);
 static int tarantool_drv_connect(db_conn_t *);
 static int tarantool_drv_disconnect(db_conn_t *);
-static db_error_t tarantool_drv_query(db_conn_t *, const char *, size_t, db_result_t *);
+static db_error_t tarantool_drv_query(db_conn_t *, const char *, size_t,
+                                      db_result_t *);
 static int tarantool_drv_done(void);
 static int tarantool_drv_prepare(db_stmt_t *, const char *, size_t);
 static int tarantool_drv_bind_param(db_stmt_t *, db_bind_t *, size_t);
@@ -101,6 +99,12 @@ static db_driver_t tarantool_driver =
 };
 
 
+/* Local functions */
+
+db_error_t tarantool_execute(struct tnt_stream *, const char *,
+                             struct tnt_stream *, db_result_t *);
+
+
 /* Register Tarantool driver */
 int register_driver_tarantool(sb_list_t *drivers)
 {
@@ -113,8 +117,6 @@ int register_driver_tarantool(sb_list_t *drivers)
 /* Tarantool driver initialization */
 int tarantool_drv_init(void)
 {
-  log_text(LOG_DEBUG, "tarantool_drv_init\n");
-
   args.host = sb_get_value_string("tarantool-host");
   args.port = sb_get_value_string("tarantool-port");
   args.user = sb_get_value_string("tarantool-user");
@@ -126,8 +128,6 @@ int tarantool_drv_init(void)
 /* Connect to database */
 int tarantool_drv_connect(db_conn_t *sb_conn)
 {
-  log_text(LOG_DEBUG, "tarantool_drv_connect");
-
   char uri[URI_MAX_LENGTH] = "";
 
   if (strcmp(args.user, GUEST_USER) && args.password) {
@@ -143,12 +143,11 @@ int tarantool_drv_connect(db_conn_t *sb_conn)
 
   log_text(LOG_DEBUG, "TNT_OPT_URI = %s", uri);
 
-  struct tnt_stream * con = tnt_net(NULL); // Allocating stream
-  tnt_set(con, TNT_OPT_URI, uri); // Setting URI
-  tnt_set(con, TNT_OPT_SEND_BUF, 0); // Disable buffering for send
-  tnt_set(con, TNT_OPT_RECV_BUF, 0); // Disable buffering for recv
+  struct tnt_stream * con = tnt_net(NULL);
+  tnt_set(con, TNT_OPT_URI, uri);
+  tnt_set(con, TNT_OPT_SEND_BUF, 0);
+  tnt_set(con, TNT_OPT_RECV_BUF, 0);
 
-  // Initialize stream and connect to Tarantool
   if (tnt_connect(con) < 0) {
     log_text(LOG_FATAL, "Connection to database failed");
     return 1;
@@ -162,13 +161,10 @@ int tarantool_drv_connect(db_conn_t *sb_conn)
 /* Disconnect from database */
 int tarantool_drv_disconnect(db_conn_t *sb_conn)
 {
-  log_text(LOG_DEBUG, "tarantool_drv_disconnect\n");
-
   struct tnt_stream * con = sb_conn->ptr;
 
   if (con != NULL) {
-    // Close connection and free stream object
-    tnt_close(con); 
+    tnt_close(con);
     tnt_stream_free(con); 
   }
 
@@ -176,57 +172,38 @@ int tarantool_drv_disconnect(db_conn_t *sb_conn)
 }
 
 /* Execute SQL query */
-db_error_t tarantool_drv_query(db_conn_t *sb_conn, const char *query, size_t len,
-                           db_result_t *rs)
+db_error_t tarantool_drv_query(db_conn_t *sb_conn, const char *query,
+                               size_t len, db_result_t *rs)
 {
-  log_text(LOG_DEBUG, "tarantool_drv_query(%p, \"%s\")", sb_conn->ptr, query);
-
   struct tnt_stream * con = sb_conn->ptr;
 
-  /*MAKE REQUEST*/
-  struct tnt_stream *tuple = tnt_object(NULL);
-  tnt_object_format(tuple, "[%s]", query);
+  struct tnt_stream *params = tnt_object(NULL);
 
-  /*SEND REQUEST*/
-  tnt_call(con, BOX_SQL_EXECUTE, sizeof(BOX_SQL_EXECUTE) - 1, tuple);
-  tnt_flush(con);
-
-  tnt_stream_free(tuple);
-
-  struct tnt_reply *reply = tnt_reply_init(NULL);
-  con->read_reply(con, reply);
-
-  if (reply->code == 0) {
-    if (reply->data_end - reply->data > MAX_NUMBER_EMPTY_RESULT)
-      rs->counter = SB_CNT_READ;
-    else
-      rs->counter = SB_CNT_WRITE;
-
-    tnt_reply_free(reply);
-  } else {
-    log_text(LOG_FATAL, "Failed %lu (%s).\n", reply->code, reply->error);
-
-    rs->counter = SB_CNT_ERROR;
-
-    tnt_reply_free(reply);
+  if (tnt_object_type(params, TNT_SBO_PACKED) == -1)
     return DB_ERROR_FATAL;
-  }
 
-  return DB_ERROR_NONE;
+  if (tnt_object_add_array(params, 0) == -1)
+    return DB_ERROR_FATAL;
+
+  if (tnt_object_container_close(params) == -1)
+    return DB_ERROR_FATAL;
+
+  db_error_t err = tarantool_execute(con, query, params, rs);
+
+  tnt_stream_free(params);
+
+  return err;
 }
 
 /* Uninitialize driver */
 int tarantool_drv_done(void)
 {
-  log_text(LOG_DEBUG, "tarantool_drv_done\n");
   return 0;
 }
 
 /* Describe database capabilities */
 int tarantool_drv_describe(drv_caps_t *caps)
 {
-  log_text(LOG_DEBUG, "tarantool_drv_describe\n");
-
   *caps = tarantool_drv_caps;
 
   char uri[URI_MAX_LENGTH] = "";
@@ -242,19 +219,17 @@ int tarantool_drv_describe(drv_caps_t *caps)
   strcat(uri, ":");
   strcat(uri, args.port);
 
-  struct tnt_stream * con = tnt_net(NULL); // Allocating stream
-  tnt_set(con, TNT_OPT_URI, uri); // Setting URI
-  tnt_set(con, TNT_OPT_SEND_BUF, 0); // Disable buffering for send
-  tnt_set(con, TNT_OPT_RECV_BUF, 0); // Disable buffering for recv
+  struct tnt_stream * con = tnt_net(NULL);
+  tnt_set(con, TNT_OPT_URI, uri);
+  tnt_set(con, TNT_OPT_SEND_BUF, 0);
+  tnt_set(con, TNT_OPT_RECV_BUF, 0);
 
-  // Initialize stream and connect to Tarantool
   if (tnt_connect(con) < 0) {
     log_text(LOG_FATAL, "Connection to database failed");
     return 1;
   }
 
   if (con != NULL) {
-    // Close connection and free stream object
     tnt_close(con);
     tnt_stream_free(con);
   }
@@ -265,15 +240,13 @@ int tarantool_drv_describe(drv_caps_t *caps)
 /* Prepare statement */
 int tarantool_drv_prepare(db_stmt_t *stmt, const char *query, size_t len)
 {
-  log_text(LOG_DEBUG, "tarantool_drv_prepare: %s\n", query);
-
   struct tnt_stream * con = stmt->connection->ptr;
-
-  (void) len; /* unused */
 
   if (con == NULL)
     return 1;
 
+  /* Use client-side PS */
+  stmt->emulated = 1;
   stmt->query = strdup(query);
 
   return 0;
@@ -282,8 +255,6 @@ int tarantool_drv_prepare(db_stmt_t *stmt, const char *query, size_t len)
 /* Bind parameters for prepared statement */
 int tarantool_drv_bind_param(db_stmt_t *stmt, db_bind_t *params, size_t len)
 {
-  log_text(LOG_DEBUG, "tarantool_drv_bind_param\n");
-
   if (stmt->bound_param != NULL)
     free(stmt->bound_param);
   stmt->bound_param = (db_bind_t *)malloc(len * sizeof(db_bind_t));
@@ -298,52 +269,57 @@ int tarantool_drv_bind_param(db_stmt_t *stmt, db_bind_t *params, size_t len)
 /* Execute prepared statement */
 db_error_t tarantool_drv_execute(db_stmt_t *stmt, db_result_t *rs)
 {
-  log_text(LOG_DEBUG, "tarantool_drv_execute\n");
+  struct tnt_stream *con = stmt->connection->ptr;
+  unsigned int      i;
+  db_error_t        rc;
+  db_bind_t         *var;
 
-  db_conn_t       *con = stmt->connection;
-  char            *buf = NULL;
-  unsigned int    buflen = 0;
-  unsigned int    i, j, vcnt;
-  char            need_realloc;
-  int             n;
-  db_error_t      rc;
-  unsigned long   len;
+  struct tnt_stream *params = tnt_object(NULL);
 
-  /* Build the actual query string from parameters list */
-  need_realloc = 1;
-  vcnt = 0;
-  for (i = 0, j = 0; stmt->query[i] != '\0'; i++)
+  if (tnt_object_type(params, TNT_SBO_PACKED) == -1)
+    return DB_ERROR_FATAL;
+
+  if (tnt_object_add_array(params, 0) == -1)
+    return DB_ERROR_FATAL;
+
+  for (i = 0; i < stmt->bound_param_len; i++)
   {
-      again:
-    if (j+1 >= buflen || need_realloc)
-    {
-      buflen = (buflen > 0) ? buflen * 2 : 256;
-      buf = realloc(buf, buflen);
-      if (buf == NULL)
+    var = stmt->bound_param + i;
+
+    switch (var->type) {
+    case DB_TYPE_TINYINT:
+    case DB_TYPE_SMALLINT:
+    case DB_TYPE_BIGINT:
+    case DB_TYPE_INT:
+      if (tnt_object_add_int(params, *(int64_t *) var->buffer) == -1)
         return DB_ERROR_FATAL;
-      need_realloc = 0;
+      break;
+    case DB_TYPE_CHAR:
+    case DB_TYPE_VARCHAR:
+      tnt_object_add_strz(params, (char *)var->buffer);
+      break;
+    case DB_TYPE_FLOAT:
+      tnt_object_add_float(params, *(float *) var->buffer);
+      break;
+    case DB_TYPE_DOUBLE:
+      tnt_object_add_double(params, *(double *) var->buffer);
+      break;
+    case DB_TYPE_DATETIME:
+    case DB_TYPE_TIMESTAMP:
+    case DB_TYPE_TIME:
+    case DB_TYPE_DATE:
+    default:
+      log_text(LOG_ALERT, "This var->type isn't implemented yet");
+      return DB_ERROR_FATAL;
     }
-
-    if (stmt->query[i] != '?')
-    {
-      buf[j++] = stmt->query[i];
-      continue;
-    }
-
-    n = db_print_value(stmt->bound_param + vcnt, buf + j, buflen - j);
-    if (n < 0)
-    {
-      need_realloc = 1;
-      goto again;
-    }
-    j += n;
-    vcnt++;
   }
-  buf[j] = '\0';
 
-  rc = tarantool_drv_query(con, buf, j, rs);
+  if (tnt_object_container_close(params) == -1)
+    return DB_ERROR_FATAL;
 
-  free(buf);
+  rc = tarantool_execute(con, stmt->query, params, rs);
+
+  tnt_stream_free(params);
 
   return rc;
 }
@@ -351,8 +327,6 @@ db_error_t tarantool_drv_execute(db_stmt_t *stmt, db_result_t *rs)
 /* Close prepared statement */
 int tarantool_drv_close(db_stmt_t *stmt)
 {
-  log_text(LOG_DEBUG, "tarantool_drv_close\n");
-
   xfree(stmt->ptr);
   xfree(stmt->query);
 
@@ -362,7 +336,35 @@ int tarantool_drv_close(db_stmt_t *stmt)
 /* Free result set */
 int tarantool_drv_free_results(db_result_t *rs)
 {
-  log_text(LOG_DEBUG, "tarantool_drv_free_results");
-
   return 0;
+}
+
+db_error_t tarantool_execute(struct tnt_stream *con, const char *query,
+                             struct tnt_stream *params, db_result_t *rs)
+{
+  tnt_execute(con, query, strlen(query), params);
+  tnt_flush(con);
+
+  struct tnt_reply *reply = tnt_reply_init(NULL);
+  con->read_reply(con, reply);
+
+  if (reply->code) {
+    log_text(LOG_FATAL, "Failed %lu (%s).\n", reply->code, reply->error);
+
+    rs->counter = SB_CNT_ERROR;
+
+    tnt_reply_free(reply);
+    return DB_ERROR_FATAL;
+  }
+
+  if (reply->metadata)
+    rs->counter = SB_CNT_READ;
+  else if (reply->sqlinfo)
+    rs->counter = SB_CNT_WRITE;
+  else
+    rs->counter = SB_CNT_OTHER;
+
+  tnt_reply_free(reply);
+
+  return DB_ERROR_NONE;
 }
