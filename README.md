@@ -263,12 +263,23 @@ The table below lists the supported common options, their descriptions and defau
 
 Note that numerical values for all *size* options (like `--thread-stack-size` in this table) may be specified by appending the corresponding multiplicative suffix (K for kilobytes, M for megabytes, G for gigabytes and T for terabytes).
 
-## Run the test with different number of threads
-The number of threads: 1, 2, 4, 8, 16, 32, 64, 128, 256, 512  
+## Running all tests
 
 Examples:  
 
-		  ./threads_steps.sh --dir=/home/ilya/projects/sysbench/ --db=pgsql --test=select_random_points 
+		  ./run_test.sh --dir=~/sysbench/ 
+
+*Option*                | *Description*             | *Default value*   | values                    |
+------------------------|---------------------------|-------------------|---------------------------
+| `--dir`               | the way to sysbench       |                   |                           |
+| `--test`              | to run a specific test    |  all test         | "oltp_read_only" "oltp_point_select" "oltp_insert" "oltp_update_index" "oltp_update_non_index" "select_random_points" "select_random_ranges" |
+| `--db`                | to run a specific database|  all test         | pgsql, mysql, tarantool   |
+| `--pgsql_password`    | postgresql password       |                   |                           |
+| `--mysql_password`    | mysql password            |                   |                           |
+| `--tarantool_password`| tarantool password        |                   |                           |
+| `--min_threads`       | start number of threads   |  1                |                           |
+| `--max_threads`       | finish number of threads  |  64               |                           |
+
 		  
 
 [coveralls-badge]: https://coveralls.io/repos/github/akopytov/sysbench/badge.svg?branch=master
