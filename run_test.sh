@@ -45,7 +45,10 @@ case $i in
 esac
 done
 
-cd $dir
+
+if ! [ -v $dir ]; then
+    cd $dir
+fi
 
 if [ -v $test ]; then
     ARRAY_TESTS=("oltp_read_only" "oltp_point_select" "oltp_insert" "oltp_update_index" "oltp_update_non_index" "select_random_points" "select_random_ranges")

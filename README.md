@@ -271,7 +271,7 @@ Examples:
 
 *Option*                | *Description*             | *Default value*   | values                    |
 ------------------------|---------------------------|-------------------|---------------------------
-| `--dir`               | the way to sysbench       |                   |                           |
+| `--dir`               | the way to sysbench       |                   | the current folder        |
 | `--test`              | to run a specific test    |  all test         | "oltp_read_only" "oltp_point_select" "oltp_insert" "oltp_update_index" "oltp_update_non_index" "select_random_points" "select_random_ranges" |
 | `--db`                | to run a specific database|  all test         | pgsql, mysql, tarantool   |
 | `--pgsql_password`    | postgresql password       |                   |                           |
