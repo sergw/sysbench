@@ -10,18 +10,22 @@ case $i in
 
     --db=*)
     db="${i#*=}"
+    echo db=$db
     ;;
 
     --max_threads=*)
     max_threads="${i#*=}"
+    echo max_threads=$max_threads
     ;;
 
     --min_threads=*)
     min_threads="${i#*=}"
+    echo min_threads=$min_threads
     ;;
 
     --dir=*)
     dir="${i#*=}"
+    echo dir=$dir
     ;;
 
     --pgsql_password=*)
@@ -38,6 +42,7 @@ case $i in
 
     --test=*)
     test="${i#*=}"
+    echo test=$test
     ;;
     *)
             # unknown option
@@ -51,7 +56,7 @@ if ! [ -v $dir ]; then
 fi
 
 if [ -v $test ]; then
-    ARRAY_TESTS=("oltp_read_only" "oltp_point_select" "oltp_insert" "oltp_update_index" "oltp_update_non_index" "select_random_points" "select_random_ranges")
+    ARRAY_TESTS=("oltp_read_only" "oltp_point_select" "oltp_insert" "oltp_update_index" "oltp_update_non_index" "select_random_points" "select_random_ranges" "bulk_insert")
 else
     ARRAY_TESTS=($test)
 fi

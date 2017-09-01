@@ -77,8 +77,8 @@ sysbench.cmdline.options = {
 }
 
 if (sysbench.sql.driver():name() == "tarantool") then
-   sysbench.cmdline.options.auto_inc[2] = false
    sysbench.cmdline.options.skip_trx[2] = true
+   sysbench.cmdline.options.secondary[2] = false
 end
 
 -- Prepare the dataset. This command supports parallel execution, i.e. will
@@ -186,14 +186,28 @@ function create_table(drv, con, table_num)
         id_def = "SERIAL"
       end
    elseif drv:name() == "tarantool" then
-      id_def = "INTEGER"
+      if sysbench.opt.auto_inc then
+         id_def = "INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT"
+      else
+         id_def = "INTEGER NOT NULL PRIMARY KEY"
+      end
    else
       error("Unsupported database driver:" .. drv:name())
    end
 
    print(string.format("Creating table 'sbtest%d'...", table_num))
 
-   query = string.format([[
+   if drv:name() == "tarantool" then
+      query = string.format([[
+CREATE TABLE sbtest%d(
+  id %s,
+  k INTEGER DEFAULT '0' NOT NULL,
+  c CHAR(120) DEFAULT '' NOT NULL,
+  pad CHAR(60) DEFAULT '' NOT NULL
+)]],
+         table_num, id_def)
+   else
+      query = string.format([[
 CREATE TABLE sbtest%d(
   id %s,
   k INTEGER DEFAULT '0' NOT NULL,
@@ -201,7 +215,8 @@ CREATE TABLE sbtest%d(
   pad CHAR(60) DEFAULT '' NOT NULL,
   %s (id)
 ) %s %s]],
-      table_num, id_def, id_index_def, engine_def, extra_table_options)
+         table_num, id_def, id_index_def, engine_def, extra_table_options)
+   end
 
    con:query(query)
 
