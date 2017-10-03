@@ -10,10 +10,6 @@
 
 - [sysbench](#sysbench)
     - [Features](#features)
-- [Installing from Binary Packages](#installing-from-binary-packages)
-    - [Linux](#linux)
-    - [macOS](#macos)
-    - [Windows](#windows)
 - [Building and Installing From Source](#building-and-installing-from-source)
     - [Build Requirements](#build-requirements)
         - [Windows](#windows)
@@ -56,78 +52,9 @@ sysbench comes with the following bundled benchmarks:
 - can be used as a general-purpose Lua interpreter as well, simply
   replace `#!/usr/bin/lua` with `#!/usr/bin/sysbench` in your script.
 
-# Installing from Binary Packages
-
-## Linux
-
-The easiest way to download and install sysbench on Linux is using
-binary package repositories hosted by
-[packagecloud](https://packagecloud.io). The repositories are
-automatically updated on each sysbench release. Currently x86_64, i386
-and aarch64 binaries are available.
-
-Multiple methods to download and install sysbench packages are available and
-described at <https://packagecloud.io/akopytov/sysbench/install>.
-
-Quick install instructions:
-
-- Debian/Ubuntu
-  ``` shell
-  curl -s https://packagecloud.io/install/repositories/akopytov/sysbench/script.deb.sh | sudo bash
-  sudo apt -y install sysbench
-  ```
-
-- RHEL/CentOS:
-  ``` shell
-  curl -s https://packagecloud.io/install/repositories/akopytov/sysbench/script.rpm.sh | sudo bash
-  sudo yum -y install sysbench
-  ```
-
-- Fedora:
-  ``` shell
-  curl -s https://packagecloud.io/install/repositories/akopytov/sysbench/script.rpm.sh | sudo bash	
-  sudo dnf -y install sysbench
-  ```
-
-## macOS
-
-On macOS, up-to-date sysbench packages are available from Homebrew:
-```shell
-# Add --with-postgresql if you need PostgreSQL support
-brew install sysbench
-```
-
-## Windows
-As of sysbench 1.0 support for native Windows builds was dropped. It may
-be re-introduced in later releases. Currently, the recommended way to
-obtain sysbench on Windows is
-using
-[Windows Subsystem for Linux available in Windows 10](https://msdn.microsoft.com/en-us/commandline/wsl/about).
-
-After installing WSL and getting into he bash prompt on Windows
-following Debian/Ubuntu installation instructions is
-sufficient. Alternatively, one can use WSL to build and install sysbench
-from source, or use an older sysbench release to build a native binary.
-
 # Building and Installing From Source
 
-It is recommended to install sysbench from the official binary
-packages as described in
-[Installing from Binary Packages](#installing-from-binary-packages). Below
-are instruction for cases when you want to use sysbench on an
-architecture for which no binary packages are available.
-
 ## Build Requirements
-
-### Windows
-As of sysbench 1.0 support for native Windows builds was
-dropped. It may be re-introduced in later versions. Currently, the
-recommended way to build sysbench on Windows is using
-[Windows Subsystem for Linux available in Windows 10](https://msdn.microsoft.com/en-us/commandline/wsl/about).
-
-After installing WSL and getting into bash prompt on Windows, following
-Debian/Ubuntu build instructions is sufficient. Alternatively, one can
-build and use an older 0.5 release on Windows.
 
 ### For tarantool support
 You need Tarantool C client libraries: [repository](https://github.com/tarantool/tarantool-c)
@@ -190,7 +117,7 @@ To compile sysbench without MySQL support, use `--without-mysql`. If no
 database drivers are available database-related scripts will not work,
 but other benchmarks will be functional.
 
-See [README-Oracle.md](README-Oracle.md) for instructions on building
+See [Oracle Build steps](#Oracle-Build-steps) for instructions on building
 with Oracle client libraries.
 
 # Usage
@@ -294,3 +221,53 @@ Examples:
 [deb-url]: https://packagecloud.io/akopytov/sysbench?filter=debs
 [rpm-badge]: https://img.shields.io/badge/Packages-RPM-blue.svg?style=flat
 [rpm-url]: https://packagecloud.io/akopytov/sysbench?filter=rpms
+
+--------------------------------------------------------------
+Oracle Build steps
+--------------------------------------------------------------
+
+Using Ubuntu 14.04 - intructions dated for 21/09/2016 (Was built on AWS
+in an r3.xlarge These actions were done against 0.5 checkout)
+
+* Setup Oracle Instant Client -
+https://help.ubuntu.com/community/Oracle%20Instant%20Client download
+from
+http://www.oracle.com/technetwork/database/features/instant-client/index-097480.html.
+
+The following RPM's and upload them to the server:
+- oracle-instantclient12.1-basic-12.1.0.2.0-1.x86_64.rpm
+- oracle-instantclient12.1-devel-12.1.0.2.0-1.x86_64.rpm
+
+```
+alien -i oracle-instantclient12.1-basic-12.1.0.2.0-1.x86_64.rpm
+alien -i oracle-instantclient12.1-devel-12.1.0.2.0-1.x86_64.rpm
+```
+
+* Install Cuda - http://www.r-tutor.com/gpu-computing/cuda-installation/cuda7.5-ubuntu
+
+```
+wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1404/x86_64/cuda-repo-ubuntu1404_7.5-18_amd64.deb
+sudo dpkg -i cuda-repo-ubuntu1404_7.5-18_amd64.deb 
+sudo apt-get update
+sudo apt-get install cuda
+export CUDA_HOME=/usr/local/cuda-7.5 
+export LD_LIBRARY_PATH=${CUDA_HOME}/lib64 
+ 
+PATH=${CUDA_HOME}/bin:${PATH}
+export PATH
+echo "/usr/lib/oracle/12.1/client64/lib" > /etc/ld.so.conf.d/oracle-client-12.1.conf
+ldconfig
+```
+
+* Build sysbench
+Use the following `configure` option to build with Oracle support:
+```
+./configure --with-oracle="/usr/lib/oracle/12.1/client64"
+```
+
+Run the following commands to allow sysbench use the full number of cores:
+```
+sudo sh -c 'for x in /sys/class/net/eth0/queues/rx-*; do echo ffffffff> $x/rps_cpus; done'
+sudo sh -c "echo 32768 > /proc/sys/net/core/rps_sock_flow_entries"
+sudo sh -c "echo 4096 > /sys/class/net/eth0/queues/rx-0/rps_flow_cnt"
+```
