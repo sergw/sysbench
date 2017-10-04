@@ -419,6 +419,9 @@ local function get_id()
    return sysbench.rand.default(1, sysbench.opt.table_size)
 end
 
+local function get_part_id(start, finish)
+    return sysbench.rand.default(start, finish)
+end
 function begin()
    stmt.begin:execute()
 end
@@ -489,20 +492,27 @@ function execute_non_index_updates()
 end
 
 function execute_delete_inserts()
-   local tnum = get_table_num()
+    local tnum = get_table_num()
+    local start = sysbench.opt.table_size * sysbench.tid / sysbench.opt.threads
+    local finish = sysbench.opt.table_size * (sysbench.tid + 1) / sysbench.opt.threads
 
-   for i = 1, sysbench.opt.delete_inserts do
-      local id = get_id()
-      local k = get_id()
+    local func_get_id = get_id
+    if sysbench.cmdline.options.skip_trx[2] then
+        func_get_id = get_part_id
+    end
 
-      param[tnum].deletes[1]:set(id)
+    for i = 1, sysbench.opt.delete_inserts do
+        local id = func_get_id(start, finish)
+        local k = get_id()
 
-      param[tnum].inserts[1]:set(id)
-      param[tnum].inserts[2]:set(k)
-      param[tnum].inserts[3]:set_rand_str(c_value_template)
-      param[tnum].inserts[4]:set_rand_str(pad_value_template)
+        param[tnum].deletes[1]:set(id)
 
-      stmt[tnum].deletes:execute()
-      stmt[tnum].inserts:execute()
-   end
+        param[tnum].inserts[1]:set(id)
+        param[tnum].inserts[2]:set(k)
+        param[tnum].inserts[3]:set_rand_str(c_value_template)
+        param[tnum].inserts[4]:set_rand_str(pad_value_template)
+
+        stmt[tnum].deletes:execute()
+        stmt[tnum].inserts:execute()
+    end
 end
