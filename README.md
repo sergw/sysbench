@@ -190,24 +190,6 @@ The table below lists the supported common options, their descriptions and defau
 
 Note that numerical values for all *size* options (like `--thread-stack-size` in this table) may be specified by appending the corresponding multiplicative suffix (K for kilobytes, M for megabytes, G for gigabytes and T for terabytes).
 
-## Running all tests
-
-Examples:  
-
-		  ./run_test.sh --dir=~/sysbench/ 
-
-*Option*                | *Description*             | *Default value*   | values                    |
-------------------------|---------------------------|-------------------|---------------------------
-| `--dir`               | the way to sysbench       |                   | the current folder        |
-| `--test`              | to run a specific test    |  all test         | "oltp_read_only" "oltp_point_select" "oltp_insert" "oltp_update_index" "oltp_update_non_index" "select_random_points" "select_random_ranges" |
-| `--db`                | to run a specific database|  all test         | pgsql, mysql, tarantool   |
-| `--pgsql_password`    | postgresql password       |                   |                           |
-| `--mysql_password`    | mysql password            |                   |                           |
-| `--tarantool_password`| tarantool password        |                   |                           |
-| `--min_threads`       | start number of threads   |  1                |                           |
-| `--max_threads`       | finish number of threads  |  64               |                           |
-
-		  
 
 [coveralls-badge]: https://coveralls.io/repos/github/akopytov/sysbench/badge.svg?branch=master
 [coveralls-url]: https://coveralls.io/github/akopytov/sysbench?branch=master
