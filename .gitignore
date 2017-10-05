@@ -85,9 +85,7 @@ tests/t/*.err
 parts
 prime
 stage
-*.snap
 /snap/snapcraft.yaml
 
-.idea/
-CMakeLists.txt
-cmake-build-debug/
+result.txt
+tarantool

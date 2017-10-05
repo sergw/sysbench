@@ -1,0 +1,29 @@
+stages:
+ - benchmark
+ - publish
+
+before_script:
+  - git submodule sync --recursive
+  - git submodule update --init --recursive
+
+sysbench-benchmark:
+  stage: benchmark
+  artifacts:
+    paths:
+      - results.json
+  script:
+   # Build Tarantool
+   - git clone --recursive https://github.com/tarantool/tarantool.git -b 1.8 1.8
+   # Build SysBench
+   # Run SysBench
+   # Print results to screen
+   # Save results to results.json
+
+sysbench-publish:
+  stage: publish
+  dependencies:
+   - sysbench
+  script:
+  # - publish results from results.json to bench.tarantool.org
+  only:
+   - master
