@@ -12,7 +12,8 @@ cd tarantool; git pull; cmake .; make; cd ..;
 sleep 2
 TNT_PID=$!
 
-./testing-tnt.sh --port=3301 --threads=1 > result.txt
+echo "test_name:result[trps]"
+./testing-tnt.sh --port=3301 --threads=1 | tee result.txt
 
 kill $TNT_PID
 wait

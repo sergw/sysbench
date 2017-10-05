@@ -50,7 +50,7 @@ def main():
 
     server, token = credentals(sys.argv[1])
     values = parse_bench(sys.argv[2])
-    version = "1.8.4-171-g1b37e3318"#get_version()
+    version = get_version()
 
     # push bench data to result server
     for value in values:
