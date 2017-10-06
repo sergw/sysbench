@@ -13,12 +13,24 @@ sysbench-benchmark:
       - results.txt
   script:
     # Build Tarantool
+    - sudo apt-get update && apt-get install -y -f \
+                build-essential cmake coreutils sed \
+                libreadline-dev libncurses5-dev libyaml-dev libssl-dev \
+                libcurl4-openssl-dev libunwind-dev \
+                python python-pip python-setuptools python-dev \
+                python-msgpack python-yaml python-argparse python-six python-gevent
+    
     - if [ ! -d "$tarantool" ]; then
     -   git clone --recursive https://github.com/tarantool/tarantool.git -b 1.8 tarantool
     - fi
     - cd tarantool; git pull; cmake .; make; cd ..;
 
     # Build SysBench
+    - if [ ! -d "$tarantool-c" ]; then
+    -   git clone --recursive https://github.com/tarantool/tarantool-c tarantool-c
+    - fi
+    - cd tarantool-c; git pull; cmake . ; make; make install; cd ..;
+    
     - ./autogen.sh; ./configure --with-tarantool; make;
 
     # Run Tarantool
