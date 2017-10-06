@@ -38,7 +38,7 @@ sysbench-publish:
   dependencies:
    - sysbench
   script:
-   - echo "mock: push to microb"
+   - echo "MOCK push to microb"
           #  - python export.py auth.conf result.txt
   only:
    - master
