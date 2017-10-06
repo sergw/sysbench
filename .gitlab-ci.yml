@@ -35,8 +35,6 @@ sysbench-benchmark:
 
 sysbench-publish:
   stage: publish
-  dependencies:
-   - sysbench
   script:
    - echo "MOCK push to microb"
           #  - python export.py auth.conf result.txt
