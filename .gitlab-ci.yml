@@ -10,20 +10,35 @@ sysbench-benchmark:
   stage: benchmark
   artifacts:
     paths:
-      - results.json
+      - results.txt
   script:
-   # Build Tarantool
-   - git clone --recursive https://github.com/tarantool/tarantool.git -b 1.8 1.8
-   # Build SysBench
-   # Run SysBench
-   # Print results to screen
-   # Save results to results.json
+    # Build Tarantool
+    - if [ ! -d "$tarantool" ]; then
+    -   git clone --recursive https://github.com/tarantool/tarantool.git -b 1.8 tarantool
+    - fi
+    - cd tarantool; git pull; cmake .; make; cd ..;
+
+    # Build SysBench
+    - ./autogen.sh; ./configure --with-tarantool; make;
+
+    # Run Tarantool
+    - rm *.xlog ; rm *.snap
+    - ./tarantool/src/tarantool start-server.lua &
+    - sleep 2; TNT_PID=$!
+
+    # Run SysBench, Print results to screen, Save results to results.txt
+    - echo "test_name:result[trps]"
+    - ./testing-tnt.sh --port=3301 --threads=1 | tee result.txt
+
+    # Clear
+    - kill $TNT_PID ; rm *.xlog ; rm *.snap
 
 sysbench-publish:
   stage: publish
   dependencies:
    - sysbench
   script:
-  # - publish results from results.json to bench.tarantool.org
+   - echo "mock: push to microb"
+          #  - python export.py auth.conf result.txt
   only:
    - master
