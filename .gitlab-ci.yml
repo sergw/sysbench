@@ -27,7 +27,6 @@ sysbench-benchmark:
     - ./autogen.sh; ./configure --with-tarantool --without-mysql; make; make install;
 
     # Run Tarantool
-    - rm *.xlog ; rm *.snap
     - tarantool start-server.lua &
     - sleep 2; TNT_PID=$!
 
@@ -36,7 +35,7 @@ sysbench-benchmark:
     - ./testing-tnt.sh --port=3301 --threads=1 | tee result.txt
 
     # Clear
-    - kill $TNT_PID ; rm *.xlog ; rm *.snap
+    - kill $TNT_PID ; rm -f *.xlog ; rm -f *.snap
 
 sysbench-publish:
   stage: publish
