@@ -36,8 +36,8 @@ ARRAY_TESTS=(
 
 for test in "${ARRAY_TESTS[@]}"; do
     echo -n $test":"
-    ./src/sysbench $test --db-driver=tarantool --threads=$threads cleanup > /dev/null
-    ./src/sysbench $test --db-driver=tarantool --threads=$threads prepare > /dev/null
-    ./src/sysbench $test --db-driver=tarantool --threads=$threads run | grep -e 'transactions:' | grep -oP '\(\K\S*'
-    ./src/sysbench $test --db-driver=tarantool --threads=$threads cleanup > /dev/null
+    sysbench $test --db-driver=tarantool --threads=$threads cleanup > /dev/null
+    sysbench $test --db-driver=tarantool --threads=$threads prepare > /dev/null
+    sysbench $test --db-driver=tarantool --threads=$threads run | grep -e 'transactions:' | grep -oP '\(\K\S*'
+    sysbench $test --db-driver=tarantool --threads=$threads cleanup > /dev/null
 done
