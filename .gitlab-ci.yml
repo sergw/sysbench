@@ -25,6 +25,7 @@ sysbench-benchmark:
     
     # Build SysBench
     - sudo apt-get update && apt-get install -y -f ssh
+    - ls -al
     - git clone git@gitlab.com:tarantool/sysbench.git sysbench
     - cd sysbench; ./autogen.sh; ./configure --with-tarantool; make; make install; cd .. ;
 
