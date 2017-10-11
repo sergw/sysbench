@@ -16,7 +16,7 @@ sysbench-benchmark:
     
     # Build Tarantool
     - git clone --recursive https://github.com/tarantool/tarantool.git -b 1.8 tarantool
-    - cd tarantool; git pull; cmake . ; make; make install; cd ..;
+    - cd tarantool; git pull; cmake . -DENABLE_DIST=ON ; make; make install; cd ..;
 
     # Build tarantool-c
     - git clone --recursive https://github.com/tarantool/tarantool-c tarantool-c
