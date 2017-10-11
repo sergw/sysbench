@@ -12,31 +12,28 @@ sysbench-benchmark:
     paths:
       - results.txt
   script:
-    # Build Tarantool
-    #- sudo apt-get update && apt-get install -y -f build-essential cmake coreutils sed libreadline-dev libncurses5-dev libyaml-dev libssl-dev libcurl4-openssl-dev libunwind-dev python python-pip python-setuptools python-dev python-msgpack python-yaml python-argparse python-six python-gevent
+    - sudo apt-get update && apt-get install -y -f ssh build-essential cmake coreutils sed libreadline-dev libncurses5-dev libyaml-dev libssl-dev libcurl4-openssl-dev libunwind-dev python python-pip python-setuptools python-dev python-msgpack python-yaml python-argparse python-six python-gevent
     
-    #- git clone --recursive https://github.com/tarantool/tarantool.git -b 1.8 tarantool
-    #- cd tarantool; git pull; cmake . ; make; make install; cd ..;
+    # Build Tarantool
+    - git clone --recursive https://github.com/tarantool/tarantool.git -b 1.8 tarantool
+    - cd tarantool; git pull; cmake . ; make; make install; cd ..;
 
     # Build tarantool-c
-    #- git clone --recursive https://github.com/tarantool/tarantool-c tarantool-c
-    #- cd tarantool-c/third_party/msgpuck/; cmake . ; make; make install; cd ../../..;
-    #- cd tarantool-c; git pull; cmake . ; make; make install; cd ..;
+    - git clone --recursive https://github.com/tarantool/tarantool-c tarantool-c
+    - cd tarantool-c/third_party/msgpuck/; cmake . ; make; make install; cd ../../..;
+    - cd tarantool-c; git pull; cmake . ; make; make install; cd ..;
     
     # Build SysBench
-    - sudo apt-get update && apt-get install -y -f ssh
-    - ls -al
-    - git clone git@gitlab.com:tarantool/sysbench.git sysbench
-    - cd sysbench; ./autogen.sh; ./configure --with-tarantool; make; make install; cd .. ;
+    - ./autogen.sh; ./configure --with-tarantool; make; make install;
 
     # Run Tarantool
     - rm *.xlog ; rm *.snap
-    - tarantool sybench/start-server.lua &
+    - tarantool start-server.lua &
     - sleep 2; TNT_PID=$!
 
     # Run SysBench, Print results to screen, Save results to results.txt
     - echo "test_name:result[trps]"
-    - ./sysbench/testing-tnt.sh --port=3301 --threads=1 | tee result.txt
+    - ./testing-tnt.sh --port=3301 --threads=1 | tee result.txt
 
     # Clear
     - kill $TNT_PID ; rm *.xlog ; rm *.snap
