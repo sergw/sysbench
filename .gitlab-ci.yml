@@ -20,12 +20,14 @@ sysbench-benchmark:
     - fi
     - cd tarantool; git pull; cmake .; make; cd ..;
 
-    # Build SysBench
+    # Build tarantool-c
     - if [ ! -d "$tarantool-c" ]; then
     -   git clone --recursive https://github.com/tarantool/tarantool-c tarantool-c
     - fi
+    - cd tarantool-c/third_party/msgpuck/; cmake . ; make; make install; cd ../../..;
     - cd tarantool-c; git pull; cmake . ; make; make install; cd ..;
     
+    # Build SysBench
     - ./autogen.sh; ./configure --with-tarantool; make;
 
     # Run Tarantool
