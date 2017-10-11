@@ -12,7 +12,7 @@ sysbench-benchmark:
     paths:
       - results.txt
   script:
-    - sudo apt-get update && apt-get install -y -f ssh build-essential cmake coreutils sed libreadline-dev libncurses5-dev libyaml-dev libssl-dev libcurl4-openssl-dev libunwind-dev python python-pip python-setuptools python-dev python-msgpack python-yaml python-argparse python-six python-gevent
+    - sudo apt-get update && apt-get install -y -f ssh dh-autoreconf pkg-config build-essential cmake coreutils sed libreadline-dev libncurses5-dev libyaml-dev libssl-dev libcurl4-openssl-dev libunwind-dev python python-pip python-setuptools python-dev python-msgpack python-yaml python-argparse python-six python-gevent
     
     # Build Tarantool
     - git clone --recursive https://github.com/tarantool/tarantool.git -b 1.8 tarantool
@@ -24,7 +24,7 @@ sysbench-benchmark:
     - cd tarantool-c; git pull; cmake . ; make; make install; cd ..;
     
     # Build SysBench
-    - ./autogen.sh; ./configure --with-tarantool; make; make install;
+    - ./autogen.sh; ./configure --with-tarantool --without-mysql; make; make install;
 
     # Run Tarantool
     - rm *.xlog ; rm *.snap
