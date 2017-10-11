@@ -13,12 +13,7 @@ sysbench-benchmark:
       - results.txt
   script:
     # Build Tarantool
-    - sudo apt-get update && apt-get upgrade -y && apt-get install -y -f \
-                build-essential cmake coreutils sed \
-                libreadline-dev libncurses5-dev libyaml-dev libssl-dev \
-                libcurl4-openssl-dev libunwind-dev \
-                python python-pip python-setuptools python-dev \
-                python-msgpack python-yaml python-argparse python-six python-gevent
+    - sudo apt-get update && apt-get install -y -f build-essential cmake coreutils sed libreadline-dev libncurses5-dev libyaml-dev libssl-dev libcurl4-openssl-dev libunwind-dev python python-pip python-setuptools python-dev python-msgpack python-yaml python-argparse python-six python-gevent
     
     - if [ ! -d "$tarantool" ]; then
     -   git clone --recursive https://github.com/tarantool/tarantool.git -b 1.8 tarantool
