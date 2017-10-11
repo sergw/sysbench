@@ -15,29 +15,26 @@ sysbench-benchmark:
     # Build Tarantool
     - sudo apt-get update && apt-get install -y -f build-essential cmake coreutils sed libreadline-dev libncurses5-dev libyaml-dev libssl-dev libcurl4-openssl-dev libunwind-dev python python-pip python-setuptools python-dev python-msgpack python-yaml python-argparse python-six python-gevent
     
-    - if [ ! -d "$tarantool" ]; then
-    -   git clone --recursive https://github.com/tarantool/tarantool.git -b 1.8 tarantool
-    - fi
-    - cd tarantool; git pull; cmake .; make; cd ..;
+    - git clone --recursive https://github.com/tarantool/tarantool.git -b 1.8 tarantool
+    - cd tarantool; git pull; cmake . ; make; make install; cd ..;
 
     # Build tarantool-c
-    - if [ ! -d "$tarantool-c" ]; then
-    -   git clone --recursive https://github.com/tarantool/tarantool-c tarantool-c
-    - fi
+    - git clone --recursive https://github.com/tarantool/tarantool-c tarantool-c
     - cd tarantool-c/third_party/msgpuck/; cmake . ; make; make install; cd ../../..;
     - cd tarantool-c; git pull; cmake . ; make; make install; cd ..;
     
     # Build SysBench
-    - ./autogen.sh; ./configure --with-tarantool; make;
+    - git clone git@gitlab.com:tarantool/sysbench.git sysbench
+    - cd sysbench; ./autogen.sh; ./configure --with-tarantool; make; make install; cd .. ;
 
     # Run Tarantool
     - rm *.xlog ; rm *.snap
-    - ./tarantool/src/tarantool start-server.lua &
+    - tarantool sybench/start-server.lua &
     - sleep 2; TNT_PID=$!
 
     # Run SysBench, Print results to screen, Save results to results.txt
     - echo "test_name:result[trps]"
-    - ./testing-tnt.sh --port=3301 --threads=1 | tee result.txt
+    - ./sysbench/testing-tnt.sh --port=3301 --threads=1 | tee result.txt
 
     # Clear
     - kill $TNT_PID ; rm *.xlog ; rm *.snap
