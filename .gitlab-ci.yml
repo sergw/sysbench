@@ -7,7 +7,7 @@ sysbench-benchmark:
   stage: benchmark
   artifacts:
     paths:
-      - results.txt
+      - result.txt
   script:
     - ./run-sysbench.sh
 

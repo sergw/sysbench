@@ -19,7 +19,7 @@ cd tarantool-c; cmake . ; make; make install; cd ..;
 ./autogen.sh; ./configure --with-tarantool --without-mysql; make; make install;
 
 # Run Tarantool
-tarantool start-server.lua &
+tarantool start-server.lua > /dev/null &
 sleep 2; TNT_PID=$!
 
 # Run SysBench, Print results to screen, Save results to results.txt
