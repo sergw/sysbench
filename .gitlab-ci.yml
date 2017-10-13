@@ -2,10 +2,6 @@ stages:
  - benchmark
  - publish
 
-before_script:
-  - git submodule sync --recursive
-  - git submodule update --init --recursive
-
 sysbench-benchmark:
   image: ubuntu
   stage: benchmark
@@ -18,7 +14,7 @@ sysbench-benchmark:
 sysbench-publish:
   stage: publish
   script:
-   - echo "MOCK push to microb"
+   - cat result.txt
 #   - python export.py auth.conf result.txt
   only:
    - master
