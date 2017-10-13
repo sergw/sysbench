@@ -1,6 +1,6 @@
 box.cfg {
     listen = 3301,
-    memtx_memory = 5000000000,
+    memtx_memory = 1000000000,
 }
 
 function try(f, catch_f)
