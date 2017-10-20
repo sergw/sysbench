@@ -3,7 +3,7 @@ stages:
  - publish
 
 sysbench-benchmark:
-  image: ubuntu
+  image: registry.gitlab.com/tarantool/sysbench-tarantool
   stage: benchmark
   artifacts:
     paths:
