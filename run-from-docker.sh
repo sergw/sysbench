@@ -45,6 +45,8 @@ ARRAY_TESTS=(
 apt-get install -y -f gdb
 rm -f result.txt
 
+tarantool -v | grep -e "Tarantool" |  grep -oP '\s\K\S*' | tee version.txt
+
 for test in "${ARRAY_TESTS[@]}"; do
     echo "------------" $test "------------"
 
@@ -59,3 +61,4 @@ done
 
 echo "test_name:result[trps]"
 cat result.txt
+

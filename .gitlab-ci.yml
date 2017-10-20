@@ -8,6 +8,7 @@ sysbench-benchmark:
   artifacts:
     paths:
       - result.txt
+      - version.txt
   script:
     - PATH_TO_SYSBENCH="/builds/tarantool/sysbench" ./run-from-docker.sh
 
@@ -16,6 +17,7 @@ sysbench-publish:
   stage: publish
   script:
    - cat result.txt
-   - python export.py auth.conf result.txt
+   - cat version.txt
+   - python export.py auth.conf result.txt version.txt
   only:
    - master

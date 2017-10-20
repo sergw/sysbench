@@ -39,18 +39,20 @@ def push(server, token, name, value, version, unit='trps', tab='sysbench'):
     else:
         print 'Export error http: %d' % r.status_code
 
-def get_version():
-    ret = commands.getoutput('./tarantool/src/tarantool --version')
-    return ret.split('\n')[0].split(' ')[1]
+def get_version(filename):
+    fileHandle = open(filename)
+    lastline = fileHandle.readlines()[-1]
+    fileHandle.close()
+    return lastline.split()[0]
 
 def main():
-    if len(sys.argv) < 3:
-        print 'Usage:\n./export.py [auth.conf] [output.file]'
+    if len(sys.argv) < 4:
+        print 'Usage:\n./export.py [auth.conf] [output.file] [tarantool-version.file]'
         return 0
 
     server, token = credentals(sys.argv[1])
     values = parse_bench(sys.argv[2])
-    version = get_version()
+    version = get_version(sys.argv[3])
 
     # push bench data to result server
     for value in values:
