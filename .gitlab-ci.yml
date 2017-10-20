@@ -9,7 +9,7 @@ sysbench-benchmark:
     paths:
       - result.txt
   script:
-    - ./run-sysbench.sh
+    - PATH_TO_SYSBENCH="/builds/iproha94/sysbench" ./run-from-docker.sh
 
 sysbench-publish:
   stage: publish
