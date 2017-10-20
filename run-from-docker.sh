@@ -59,4 +59,3 @@ done
 
 echo "test_name:result[trps]"
 cat result.txt
-python export.py auth.conf result.txt

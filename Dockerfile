@@ -6,6 +6,8 @@ RUN apt-get update
 
 RUN apt-get install -y -f gcc libc6-dev zlib1g-dev make libmysqlclient-dev
 RUN apt-get install -y -f ssh vim git dh-autoreconf pkg-config libicu-dev
+RUN apt-get install -y -f python python-pip
+RUN python -m pip install requests
 RUN apt-get install -y -f build-essential cmake coreutils sed libreadline-dev \
       libncurses5-dev libyaml-dev libssl-dev libcurl4-openssl-dev \
       libunwind-dev python python-pip python-setuptools python-dev \

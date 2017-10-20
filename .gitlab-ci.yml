@@ -12,9 +12,10 @@ sysbench-benchmark:
     - PATH_TO_SYSBENCH="/builds/tarantool/sysbench" ./run-from-docker.sh
 
 sysbench-publish:
+  image: registry.gitlab.com/tarantool/sysbench
   stage: publish
   script:
    - cat result.txt
-#   - python export.py auth.conf result.txt
+   - python export.py auth.conf result.txt
   only:
    - master
