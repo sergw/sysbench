@@ -52,7 +52,7 @@ for test in "${ARRAY_TESTS[@]}"; do
 
     sysbench $test --db-driver=tarantool --threads=1 cleanup | tee $test".txt"
     sysbench $test --db-driver=tarantool --threads=1 prepare | tee -a $test".txt"
-    sysbench $test --db-driver=tarantool --threads=1 --time=120 --warmup-time=10 run | tee -a $test".txt"
+    sysbench $test --db-driver=tarantool --threads=1 --time=220 --warmup-time=10 run | tee -a $test".txt"
     sysbench $test --db-driver=tarantool --threads=1 cleanup | tee -a $test".txt"
 
     echo -n $test":" | tee -a result.txt
