@@ -3,6 +3,7 @@
 # Build Tarantool
 cd /tarantool
 git pull
+if [ -n "${BRANCH}" ]; then git checkout ${BRANCH}; fi
 cmake . -DENABLE_DIST=ON; make; make install
 
 # Build tarantool-c
