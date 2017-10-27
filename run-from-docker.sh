@@ -4,6 +4,8 @@
 cd /tarantool
 git pull
 if [ -n "${BRANCH}" ]; then git checkout ${BRANCH}; fi
+branch_name="$(git symbolic-ref HEAD 2>/dev/null)"
+branch_name=${branch_name##refs/heads/}
 cmake . -DENABLE_DIST=ON; make; make install
 
 # Build tarantool-c
@@ -47,8 +49,6 @@ apt-get install -y -f gdb
 rm -f result.txt
 
 TAR_VER=$(tarantool -v | grep -e "Tarantool" |  grep -oP '\s\K\S*')
-branch_name="$(git symbolic-ref HEAD 2>/dev/null)"
-branch_name=${branch_name##refs/heads/}
 echo $TAR_VER"["$branch_name"]" | tee version.txt
 
 if [ ! -n "${TIME}" ]; then TIME=220; fi
