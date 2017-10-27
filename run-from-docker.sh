@@ -48,12 +48,14 @@ rm -f result.txt
 
 tarantool -v | grep -e "Tarantool" |  grep -oP '\s\K\S*' | tee version.txt
 
+if [ ! -n "${TIME}" ]; then TIME=220; fi
+
 for test in "${ARRAY_TESTS[@]}"; do
     echo "------------" $test "------------"
 
     sysbench $test --db-driver=tarantool --threads=1 cleanup | tee $test".txt"
     sysbench $test --db-driver=tarantool --threads=1 prepare | tee -a $test".txt"
-    sysbench $test --db-driver=tarantool --threads=1 --time=220 --warmup-time=10 run | tee -a $test".txt"
+    sysbench $test --db-driver=tarantool --threads=1 --time=${TIME} --warmup-time=10 run | tee -a $test".txt"
     sysbench $test --db-driver=tarantool --threads=1 cleanup | tee -a $test".txt"
 
     echo -n $test":" | tee -a result.txt
