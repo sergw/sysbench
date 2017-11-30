@@ -12,7 +12,7 @@ cmake . -DENABLE_DIST=ON; make; make install
 # define tarantool version
 cd ${PATH_TO_SYSBENCH}
 TAR_VER=$(tarantool -v | grep -e "Tarantool" |  grep -oP '\s\K\S*')
-echo ${TAR_VER}"["${BRANCH}"]" | tee version.txt
+echo ${TAR_VER} | tee version.txt
 
 # Build tarantool-c
 cd /tarantool-c
