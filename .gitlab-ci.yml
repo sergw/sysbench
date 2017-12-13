@@ -15,11 +15,10 @@ sysbench-benchmark:
     - triggers
 
 sysbench-publish:
-  image: registry.gitlab.com/tarantool/sysbench
+  image: registry.gitlab.com/tarantool/sysbench/result-publication
   stage: publish
   script:
     - cat result.txt
     - cat version.txt
-    - python export.py auth.conf result.txt version.txt
   only:
     - triggers
