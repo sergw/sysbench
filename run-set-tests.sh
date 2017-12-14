@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 ARRAY_TESTS=(
     "oltp_read_only"
     "oltp_write_only"

@@ -25,4 +25,4 @@ cd ${PATH_TO_SYSBENCH}
 
 # run sysbench
 apt-get install -y -f gdb
-TIME=${TIME} ./run-set-tests.sh
+./run-set-tests.sh
