@@ -20,6 +20,6 @@ sysbench-publish:
   script:
     - cat ./benchmarking/result.txt
     - cat ./benchmarking/version.txt
-    - ./result-publication/main.py ./benchmarking/result.txt ./benchmarking/version.txt
+    - ./publication/main.py ./benchmarking/result.txt ./benchmarking/version.txt
   only:
     - triggers
