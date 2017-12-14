@@ -20,6 +20,6 @@ sysbench-publish:
   script:
     - cat result.txt
     - cat version.txt
-    - ./result-publication/main.py result.txt version.txt
+    - python ./result-publication/main.py result.txt version.txt
   only:
     - triggers
