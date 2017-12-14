@@ -31,18 +31,15 @@ def push_to_grafana(server, port, name, value, version, unit='trps', db='sysbenc
         value
     )
 
-    try:
-        r = requests.post(
-            url_string,
-            data=data_string
-        )
+    r = requests.post(
+        url_string,
+        data=data_string
+    )
 
-        if r.status_code == 200:
-            print 'Export complete'
-        else:
-            print 'Export error http: %d' % r.status_code
-    except:
-        print("except")
+    if r.status_code == 204:
+        print 'Export to grafana complete'
+    else:
+        print 'Export to grafana error http: %d' % r.status_code
 
 def push_to_microb(server, token, name, value, version, unit='trps', tab='sysbench'):
     uri = 'http://%s/push?%s' % (server, urlencode(dict(
