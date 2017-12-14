@@ -3,7 +3,7 @@ stages:
  - publish
 
 sysbench-benchmark:
-  image: registry.gitlab.com/tarantool/sysbench
+  image: registry.gitlab.com/tarantool/sysbench/benchmarking
   stage: benchmark
   artifacts:
     paths:
@@ -20,6 +20,6 @@ sysbench-publish:
   script:
     - cat result.txt
     - cat version.txt
-    - python ./result-publication/main.py result.txt version.txt
+    - ./result-publication/main.py result.txt version.txt
   only:
     - triggers
