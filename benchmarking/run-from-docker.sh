@@ -2,29 +2,28 @@
 
 set -e
 
-if [ ! -n "${PATH_TO_SYSBENCH}" ]; then PATH_TO_SYSBENCH=$(pwd); fi
+if [ ! -n "${PATH_TO_BENCHMARKING}" ]; then PATH_TO_BENCHMARKING=$(pwd)/benchmarking/; fi
+if [ ! -n "${PATH_TO_TARANTOOL}" ]; then PATH_TO_TARANTOOL="/opt/tarantool"; fi
 
 # build Tarantool
 if [ ! -n "${BRANCH}" ]; then BRANCH="1.8"; fi
-if [ ! -n "${HEAD_OFFSET}" ]; then HEAD="0"; fi
-cd /opt/tarantool
+if [ ! -n "${HEAD_OFFSET}" ]; then HEAD_OFFSET="0"; fi
+cd ${PATH_TO_TARANTOOL}
+git pull
 git checkout ${BRANCH}
 git checkout HEAD~${HEAD_OFFSET}
 cmake . -DENABLE_DIST=ON; make; make install
 
 # define tarantool version
-cd ${PATH_TO_SYSBENCH}
+cd ${PATH_TO_BENCHMARKING}
 TAR_VER=$(tarantool -v | grep -e "Tarantool" |  grep -oP '\s\K\S*')
 echo ${TAR_VER} | tee version.txt
 
 # run tarantool
-cd ${PATH_TO_SYSBENCH}
+cd ${PATH_TO_BENCHMARKING}
 ./run-tarantool-server.sh
-
-# build sysbench
-cd ${PATH_TO_SYSBENCH}
-./autogen.sh; ./configure --with-tarantool --without-mysql; make; make install;
 
 # run sysbench
 apt-get install -y -f gdb
+cd ${PATH_TO_BENCHMARKING}
 ./run-set-tests.sh

@@ -253,3 +253,8 @@ sudo sh -c 'for x in /sys/class/net/eth0/queues/rx-*; do echo ffffffff> $x/rps_c
 sudo sh -c "echo 32768 > /proc/sys/net/core/rps_sock_flow_entries"
 sudo sh -c "echo 4096 > /sys/class/net/eth0/queues/rx-0/rps_flow_cnt"
 ```
+
+Build Docker image
+```bash
+docker build -t registry.gitlab.com/tarantool/sysbench/benchmarking -f benchmarking/Dockerfile .
+```
