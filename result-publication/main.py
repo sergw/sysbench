@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import sys
 from urllib import urlencode
@@ -41,9 +43,6 @@ def push_to_grafana(server, port, name, value, version, unit='trps', db='sysbenc
             print 'Export error http: %d' % r.status_code
     except:
         print("except")
-
-
-    pass
 
 def push_to_microb(server, token, name, value, version, unit='trps', tab='sysbench'):
     uri = 'http://%s/push?%s' % (server, urlencode(dict(
