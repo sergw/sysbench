@@ -6,8 +6,10 @@ if [ ! -n "${PATH_TO_SYSBENCH}" ]; then PATH_TO_SYSBENCH=$(pwd); fi
 
 # build Tarantool
 if [ ! -n "${BRANCH}" ]; then BRANCH="1.8"; fi
+if [ ! -n "${HEAD_OFFSET}" ]; then HEAD="0"; fi
 cd /opt/tarantool
 git checkout ${BRANCH}
+git checkout HEAD~${HEAD_OFFSET}
 cmake . -DENABLE_DIST=ON; make; make install
 
 # define tarantool version
