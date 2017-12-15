@@ -23,12 +23,24 @@ def push_to_grafana(server, port, name, value, version, unit='trps', db='sysbenc
     else:
         branch_name = "1.8"
 
+    if "THREADS" in os.environ:
+        threads = os.environ['THREADS']
+    else:
+        threads = "1"
+
+    if "TIME" in os.environ:
+        time = os.environ['TIME']
+    else:
+        time = "220"
+
     url_string = 'http://{}:{}/write?db={}'.format(server, port, db)
-    data_string = '{},version={},branch={} value={}'.format(
+    data_string = '{},version={},branch={},threads={},duration={} value={}'.format(
         name,
         version,
         branch_name,
-        value
+        threads,
+        time,
+        value,
     )
 
     r = requests.post(
