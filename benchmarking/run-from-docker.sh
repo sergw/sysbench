@@ -12,7 +12,7 @@ cd ${PATH_TO_TARANTOOL}
 git pull
 git checkout ${BRANCH}
 git checkout HEAD~${HEAD_OFFSET}
-cmake . -DENABLE_DIST=ON; make; make install
+cmake . -DENABLE_DIST=ON  -DCMAKE_BUILD_TYPE=Release; make; make install
 
 # define tarantool version
 cd ${PATH_TO_BENCHMARKING}
