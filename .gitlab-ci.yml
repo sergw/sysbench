@@ -1,6 +1,7 @@
 stages:
  - benchmark
  - publish
+ - sending-email
 
 sysbench-benchmark:
   image: registry.gitlab.com/tarantool/sysbench/benchmarking
@@ -21,5 +22,13 @@ sysbench-publish:
     - cat ./benchmarking/result.txt
     - cat ./benchmarking/version.txt
     - ./publication/main.py ./benchmarking/result.txt ./benchmarking/version.txt
+  only:
+    - triggers
+
+sysbench-sending-email:
+  image: registry.gitlab.com/tarantool/sysbench/sending-email
+  stage: sending-email
+  script:
+    - ./sending-email/send.sh
   only:
     - triggers
