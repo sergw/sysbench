@@ -33,13 +33,19 @@ def push_to_grafana(server, port, name, value, version, unit='trps', db='sysbenc
     else:
         time = "220"
 
+    if "DCMAKE_BUILD_TYPE" in os.environ:
+        build = os.environ['DCMAKE_BUILD_TYPE']
+    else:
+        build = "RelWithDebInfo"
+
     url_string = 'http://{}:{}/write?db={}'.format(server, port, db)
-    data_string = '{},version={},branch={},threads={},duration={} value={}'.format(
+    data_string = '{},version={},branch={},threads={},duration={},build={} value={}'.format(
         name,
         version,
         branch_name,
         threads,
         time,
+        build,
         value,
     )
 
