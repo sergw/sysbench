@@ -11,6 +11,7 @@ box.cfg {
     memtx_memory = 2000000000,
     checkpoint_interval = 0,
     background = true,
+    wal_mode = 'none',
 }
 
 
