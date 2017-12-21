@@ -7,3 +7,5 @@ echo "all results:" >> letter.txt
 echo "http://bench.tarantool.org/?tab=tab-sysbench" >> letter.txt
 
 cat letter.txt | mutt -s "sysbench result for $(cat ./benchmarking/version.txt)" -- ${MY_EMAIL}
+
+service postfix restart
