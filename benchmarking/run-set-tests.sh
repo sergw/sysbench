@@ -33,7 +33,7 @@ for test in "${ARRAY_TESTS[@]}"; do
 
     sysbench $test --db-driver=${DBMS} --threads=${THREADS} cleanup | tee $test".txt"
     sysbench $test --db-driver=${DBMS} --threads=${THREADS} prepare | tee -a $test".txt"
-    sysbench $test --db-driver=${DBMS} --threads=${THREADS} --time=${TIME} --warmup-time=10 run | tee -a $test".txt"
+    sysbench $test --db-driver=${DBMS} --threads=${THREADS} --time=${TIME} --warmup-time=1 run | tee -a $test".txt"
     sysbench $test --db-driver=${DBMS} --threads=${THREADS} cleanup | tee -a $test".txt"
 
     echo -n $test":" | tee -a ${RESULT_FILE_NAME}
