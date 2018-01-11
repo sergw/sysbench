@@ -10,8 +10,8 @@ if [ ! -n "${BRANCH}" ]; then BRANCH="1.8"; fi
 if [ ! -n "${HEAD_OFFSET}" ]; then HEAD_OFFSET="0"; fi
 if [ ! -n "${DCMAKE_BUILD_TYPE}" ]; then DCMAKE_BUILD_TYPE="RelWithDebInfo"; fi
 cd ${PATH_TO_TARANTOOL}
-git pull
 git checkout ${BRANCH}
+git pull origin ${BRANCH}
 git checkout HEAD~${HEAD_OFFSET}
 cmake . -DENABLE_DIST=ON  -DCMAKE_BUILD_TYPE=${DCMAKE_BUILD_TYPE} ; make; make install
 

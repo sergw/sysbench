@@ -14,7 +14,8 @@ RUN apt-get update && apt-get install -y -f \
 RUN git clone --recursive https://github.com/tarantool/tarantool.git \
     -b 1.8 /opt/tarantool
 WORKDIR /opt/tarantool
-RUN cmake . -DENABLE_DIST=ON  -DCMAKE_BUILD_TYPE=RelWithDebInfo ; make; make install
+RUN cmake . -DENABLE_DIST=ON  -DCMAKE_BUILD_TYPE=RelWithDebInfo && \
+    make; make install
 
 # download, build, install tarantool-c
 RUN git clone --recursive https://github.com/tarantool/tarantool-c.git \
@@ -29,9 +30,6 @@ COPY . /opt/sysbench
 WORKDIR /opt/sysbench
 RUN ./autogen.sh; ./configure --with-tarantool --without-mysql && \
     make; make install
-
-RUN mkdir -p /usr/local/var/lib/tarantool/sysbench-server/ && \
-    mkdir -p /usr/local/var/run/tarantool
 
 WORKDIR /opt/sysbench
 CMD ["./benchmarking/run-from-docker.sh"]
