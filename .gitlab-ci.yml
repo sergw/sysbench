@@ -14,6 +14,7 @@ sysbench-benchmark:
     - ./benchmarking/run-from-docker.sh
   only:
     - triggers
+    - schedules
 
 sysbench-publish:
   image: registry.gitlab.com/tarantool/sysbench/publication
@@ -24,6 +25,7 @@ sysbench-publish:
     - ./publication/main.py ./benchmarking/result.txt ./benchmarking/version.txt
   only:
     - triggers
+    - schedules
 
 sysbench-sending-email:
   image: registry.gitlab.com/tarantool/sysbench/sending-email
