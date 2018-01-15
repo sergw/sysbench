@@ -19,7 +19,7 @@ ARRAY_TESTS=(
 if [ -n "${TEST}" ]; then ARRAY_TESTS=("${TEST}"); fi
 
 
-if [ ! -n "${TIME}" ]; then TIME=220; fi
+if [ ! -n "${TIME}" ]; then TIME=5; fi
 if [ ! -n "${DBMS}" ]; then DBMS="tarantool"; fi
 if [ ! -n "${THREADS}" ]; then THREADS=1; fi
 if [ ! -n "${RESULT_FILE_NAME}" ]; then RESULT_FILE_NAME="result.txt"; fi
