@@ -16,21 +16,21 @@ sysbench-benchmark:
     - triggers
     - schedules
 
-sysbench-publish:
-  image: registry.gitlab.com/tarantool/sysbench/publication
-  stage: publish
-  script:
-    - cat ./benchmarking/result.txt
-    - cat ./benchmarking/version.txt
-    - ./publication/main.py ./benchmarking/result.txt ./benchmarking/version.txt
-  only:
-    - triggers
-    - schedules
+#sysbench-publish:
+#  image: registry.gitlab.com/tarantool/sysbench/publication
+#  stage: publish
+#  script:
+#    - cat ./benchmarking/result.txt
+#    - cat ./benchmarking/version.txt
+#    - ./publication/main.py ./benchmarking/result.txt ./benchmarking/version.txt
+#  only:
+#    - triggers
+#    - schedules
 
-sysbench-sending-email:
-  image: registry.gitlab.com/tarantool/sysbench/sending-email
-  stage: sending-email
-  script:
-    - ./sending-email/send.sh
-  only:
-    - triggers
+#sysbench-sending-email:
+#  image: registry.gitlab.com/tarantool/sysbench/sending-email
+#  stage: sending-email
+#  script:
+#    - ./sending-email/send.sh
+#  only:
+#    - triggers

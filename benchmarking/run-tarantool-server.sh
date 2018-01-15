@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-taskset 0x1 sh -c "tarantool sysbench-server.lua"
+tarantool sysbench-server.lua
 
 STATUS="$(echo box.info.status | tarantoolctl connect /tmp/sysbench-server.sock | grep -e "- running")"
 

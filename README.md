@@ -256,5 +256,5 @@ sudo sh -c "echo 4096 > /sys/class/net/eth0/queues/rx-0/rps_flow_cnt"
 
 Build Docker image
 ```bash
-docker build -t registry.gitlab.com/tarantool/sysbench/benchmarking -f benchmarking/Dockerfile .
+docker build --no-cache -t registry.gitlab.com/tarantool/sysbench/benchmarking -f benchmarking/Dockerfile .
 ```
