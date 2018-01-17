@@ -27,4 +27,5 @@ numactl --membind=0 --cpunodebind=0 --physcpubind=2 ./run-tarantool-server.sh
 # run sysbench
 apt-get install -y -f gdb
 cd ${PATH_TO_BENCHMARKING}
+echo 3 > /proc/sys/vm/drop_caches
 numactl --membind=0 --cpunodebind=0 --physcpubind=3 ./run-set-tests.sh

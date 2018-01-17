@@ -19,7 +19,8 @@ ARRAY_TESTS=(
 if [ -n "${TEST}" ]; then ARRAY_TESTS=("${TEST}"); fi
 
 
-if [ ! -n "${TIME}" ]; then TIME=5; fi
+if [ ! -n "${WARMUP_TIME}" ]; then WARMUP_TIME=5; fi
+if [ ! -n "${TIME}" ]; then TIME=100; fi
 if [ ! -n "${DBMS}" ]; then DBMS="tarantool"; fi
 if [ ! -n "${THREADS}" ]; then THREADS=1; fi
 if [ ! -n "${RESULT_FILE_NAME}" ]; then RESULT_FILE_NAME="result.txt"; fi
@@ -33,7 +34,7 @@ for test in "${ARRAY_TESTS[@]}"; do
 
     sysbench $test --db-driver=${DBMS} --threads=${THREADS} cleanup | tee $test".txt"
     sysbench $test --db-driver=${DBMS} --threads=${THREADS} prepare | tee -a $test".txt"
-    sysbench $test --db-driver=${DBMS} --threads=${THREADS} --time=${TIME} --warmup-time=1 run | tee -a $test".txt"
+    sysbench $test --db-driver=${DBMS} --threads=${THREADS} --time=${TIME} --warmup-time=${WARMUP_TIME} run | tee -a $test".txt"
     sysbench $test --db-driver=${DBMS} --threads=${THREADS} cleanup | tee -a $test".txt"
 
     echo -n $test":" | tee -a ${RESULT_FILE_NAME}
