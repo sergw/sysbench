@@ -22,9 +22,9 @@ echo ${TAR_VER} | tee version.txt
 
 # run tarantool
 cd ${PATH_TO_BENCHMARKING}
-taskset 0x10 sh -c "./run-tarantool-server.sh"
+taskset 0x2 sh -c "./run-tarantool-server.sh"
 
 # run sysbench
 apt-get install -y -f gdb
 cd ${PATH_TO_BENCHMARKING}
-taskset 0xE0 sh -c "./run-set-tests.sh"
+taskset 0xC sh -c "./run-set-tests.sh"
