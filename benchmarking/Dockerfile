@@ -3,7 +3,7 @@ FROM ubuntu:16.04
 MAINTAINER Ilya Petukhov <iproha94@tarantool.org>
 
 RUN apt-get update && apt-get install -y -f \
-    gcc libc6-dev zlib1g-dev make libmysqlclient-dev \
+    numactl gcc libc6-dev zlib1g-dev make libmysqlclient-dev \
     ssh vim git dh-autoreconf pkg-config libicu-dev \
     build-essential cmake coreutils sed libreadline-dev \
     libncurses5-dev libyaml-dev libssl-dev libcurl4-openssl-dev \
