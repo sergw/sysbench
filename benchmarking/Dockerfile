@@ -1,5 +1,5 @@
 # Version: 0.0.1
-FROM ubuntu:16.04
+FROM ubuntu:17.10
 MAINTAINER Ilya Petukhov <iproha94@tarantool.org>
 
 RUN apt-get update && apt-get install -y -f \
