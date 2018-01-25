@@ -6,7 +6,8 @@ if [ ! -f "benchmarking/commit-author.txt" ]; then exit 0; fi
 
 EMAIL_RCPT=`cat benchmarking/commit-author.txt`
 
-cat ./benchmarking/result.txt > letter.txt
+echo "Hello" > letter.txt
+cat ./benchmarking/result.txt >> letter.txt
 echo "all results:" >> letter.txt
 echo "http://bench.tarantool.org/?tab=tab-sysbench" >> letter.txt
 
