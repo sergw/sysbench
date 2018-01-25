@@ -15,5 +15,5 @@ curl --connect-timeout 15 -v \
     -u "${EMAIL_LOGIN}:${EMAIL_PASSWORD}" \
     --mail-from "${EMAIL_LOGIN}" \
     --mail-rcpt "${EMAIL_RCPT}" \
-    -T letter.txt --ssl
+    -T letter.txt --ssl --ipv4
 
