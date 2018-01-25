@@ -1,5 +1,3 @@
-FROM ubuntu:16.04
-
+FROM ubuntu:17.10
 RUN apt update
-
-RUN apt install -y mutt
+RUN apt install -y curl

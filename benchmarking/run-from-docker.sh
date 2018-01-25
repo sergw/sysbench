@@ -19,6 +19,7 @@ cmake . -DENABLE_DIST=ON  -DCMAKE_BUILD_TYPE=${DCMAKE_BUILD_TYPE} ; make; make i
 cd ${PATH_TO_BENCHMARKING}
 if [ "${BRANCH}" != "1.8" ]; then
     echo "0.0.0-0-"${BRANCH} | tee version.txt
+    git log --format='%ae'| head -1  | tee commit-author.txt
 else
     TAR_VER=$(tarantool -v | grep -e "Tarantool" |  grep -oP '\s\K\S*')
     echo ${TAR_VER} | tee version.txt
