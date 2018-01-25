@@ -12,6 +12,7 @@ sysbench-benchmark:
       - ./benchmarking/result.txt
       - ./benchmarking/version.txt
       - ./benchmarking/commit-author.txt
+      - ./benchmarking/last-test.txt
   script:
     - ./benchmarking/run-from-docker.sh
   tags:
@@ -24,8 +25,12 @@ sysbench-benchmark:
 sysbench-sending-email-on-failure:
   image: registry.gitlab.com/tarantool/sysbench/sending-email
   stage: sending-email-on-failure
+  artifacts:
+    paths:
+      - letter.txt
   script:
     - ./sending-email/send.sh
+    - cat letter.txt
   when: on_failure
   tags:
     - gitlab-org
@@ -35,8 +40,12 @@ sysbench-sending-email-on-failure:
 sysbench-sending-email-on-success:
   image: registry.gitlab.com/tarantool/sysbench/sending-email
   stage: sending-email-on-success
+  artifacts:
+    paths:
+      - letter.txt
   script:
     - SUCCESS_BENCHMARK=1 ./sending-email/send.sh
+    - cat letter.txt
   when: on_success
   tags:
     - gitlab-org
