@@ -21,8 +21,13 @@ if [ -n "${SUCCESS_BENCHMARK}" ]; then
 else
     echo "Subject: [benchmarks] Fail $BRANCH" > letter.txt
     echo "Hello" >> letter.txt
-    echo "Fail benchmark. See" >> letter.txt
+    echo "Fail benchmark." >> letter.txt
+    echo "----------" >> letter.txt
+    echo "Fail test:" >> letter.txt
     cat ./benchmarking/last-test.txt >> letter.txt
+    echo "----------" >> letter.txt
+    echo "Tarantool log:" >> letter.txt
+    cat ./benchmarking/sysbench-server.log >> letter.txt
 fi
 
 curl --connect-timeout 15 -v \

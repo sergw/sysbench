@@ -14,6 +14,7 @@ sysbench-benchmark:
       - ./benchmarking/version.txt
       - ./benchmarking/commit-author.txt
       - ./benchmarking/last-test.txt
+      - ./benchmarking/sysbench-server.log
   script:
     - ./benchmarking/run-from-docker.sh
   tags:
