@@ -9,17 +9,18 @@ else
     EMAIL_RCPT="${EMAIL_DEFAULT}"
 fi
 
-VERSION=`cat benchmarking/version.txt`
-
-echo "Subject: [benchmarks] $VERSION $BRANCH" > letter.txt
-echo "Hello" >> letter.txt
-
+if [ ! -n "${BRANCH}" ]; then BRANCH="1.8"; fi
 
 if [ -n "${SUCCESS_BENCHMARK}" ]; then
+    VERSION=`cat benchmarking/version.txt`
+    echo "Subject: [benchmarks] Success $VERSION $BRANCH" > letter.txt
+    echo "Hello" >> letter.txt
     cat ./benchmarking/result.txt >> letter.txt
     echo "all results:" >> letter.txt
     echo "http://bench.tarantool.org/?tab=tab-sysbench" >> letter.txt
 else
+    echo "Subject: [benchmarks] Fail $BRANCH" > letter.txt
+    echo "Hello" >> letter.txt
     echo "Fail benchmark. See" >> letter.txt
     echo "https://gitlab.com/tarantool/sysbench/pipelines" >> letter.txt
 fi

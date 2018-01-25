@@ -36,6 +36,7 @@ for test in "${ARRAY_TESTS[@]}"; do
     sysbench $test --db-driver=${DBMS} --threads=${THREADS} prepare >> $test".txt"
     sysbench $test --db-driver=${DBMS} --threads=${THREADS} --time=${TIME} --warmup-time=${WARMUP_TIME} run >> $test".txt"
     sysbench $test --db-driver=${DBMS} --threads=${THREADS} cleanup >> $test".txt"
+    cat $test".txt"
 
     echo -n $test":" | tee -a ${RESULT_FILE_NAME}
     cat $test".txt" | grep -e 'transactions:' | grep -oP '\(\K\S*' | tee -a ${RESULT_FILE_NAME}
