@@ -22,7 +22,7 @@ else
     echo "Subject: [benchmarks] Fail $BRANCH" > letter.txt
     echo "Hello" >> letter.txt
     echo "Fail benchmark. See" >> letter.txt
-    echo "https://gitlab.com/tarantool/sysbench/pipelines" >> letter.txt
+    cat ./benchmarking/last-test.txt >> letter.txt
 fi
 
 curl --connect-timeout 15 -v \
