@@ -1,7 +1,8 @@
 stages:
  - benchmark
+ - sending-email-on-success
+ - sending-email-on-failure
  - publish
- - sending-email
 
 sysbench-benchmark:
   image: registry.gitlab.com/tarantool/sysbench/benchmarking
@@ -20,6 +21,28 @@ sysbench-benchmark:
     - triggers
     - schedules
 
+sysbench-sending-email-on-failure:
+  image: registry.gitlab.com/tarantool/sysbench/sending-email
+  stage: sending-email-on-failure
+  script:
+    - ./sending-email/send.sh
+  when: on_failure
+  tags:
+    - gitlab-org
+  only:
+    - triggers
+
+sysbench-sending-email-on-success:
+  image: registry.gitlab.com/tarantool/sysbench/sending-email
+  stage: sending-email-on-success
+  script:
+    - SUCCESS_BENCHMARK=1 ./sending-email/send.sh
+  when: on_success
+  tags:
+    - gitlab-org
+  only:
+    - triggers
+
 sysbench-publish:
   image: registry.gitlab.com/tarantool/sysbench/publication
   stage: publish
@@ -32,13 +55,3 @@ sysbench-publish:
   only:
     - triggers
     - schedules
-
-sysbench-sending-email:
-  image: registry.gitlab.com/tarantool/sysbench/sending-email
-  stage: sending-email
-  script:
-    - SUCCESS_BENCHMARK=1 ./sending-email/send.sh
-  tags:
-    - gitlab-org
-  only:
-    - triggers
