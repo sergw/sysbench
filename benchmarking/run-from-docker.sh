@@ -24,6 +24,7 @@ if [ "${BRANCH}" != "1.8" ]; then
 else
     TAR_VER=$(tarantool -v | grep -e "Tarantool" |  grep -oP '\s\K\S*')
     echo ${TAR_VER} | tee version.txt
+    echo "iproha94@tarantool.org" > commit-author.txt
 fi
 
 # run tarantool
