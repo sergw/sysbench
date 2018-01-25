@@ -13,6 +13,9 @@ sysbench-benchmark:
       - ./benchmarking/commit-author.txt
   script:
     - ./benchmarking/run-from-docker.sh
+  tags:
+    - sh5
+    - tarantool
   only:
     - triggers
     - schedules
@@ -24,6 +27,8 @@ sysbench-publish:
     - cat ./benchmarking/result.txt
     - cat ./benchmarking/version.txt
     - ./publication/main.py ./benchmarking/result.txt ./benchmarking/version.txt
+  tags:
+    - gitlab-org
   only:
     - triggers
     - schedules
