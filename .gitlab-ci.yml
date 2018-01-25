@@ -8,6 +8,7 @@ sysbench-benchmark:
   image: registry.gitlab.com/tarantool/sysbench/benchmarking
   stage: benchmark
   artifacts:
+    when: always
     paths:
       - ./benchmarking/result.txt
       - ./benchmarking/version.txt
