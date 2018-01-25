@@ -33,5 +33,7 @@ sysbench-sending-email:
   stage: sending-email
   script:
     - ./sending-email/send.sh
+  tags:
+    - gitlab-org
   only:
     - triggers
