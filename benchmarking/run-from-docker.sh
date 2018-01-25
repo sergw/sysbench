@@ -13,15 +13,14 @@ cd ${PATH_TO_TARANTOOL}
 git pull
 git checkout ${BRANCH}
 git checkout HEAD~${HEAD_OFFSET}
-if [ "${BRANCH}" != "1.8" ]; then
-    git log --format='%ae'| head -1  | tee commit-author.txt
-fi
+git log --format='%ae'| head -1  | tee commit-author.txt
 cmake . -DENABLE_DIST=ON  -DCMAKE_BUILD_TYPE=${DCMAKE_BUILD_TYPE} ; make; make install
 
 # define tarantool version
 cd ${PATH_TO_BENCHMARKING}
 if [ "${BRANCH}" != "1.8" ]; then
     echo "0.0.0-0-"${BRANCH} | tee version.txt
+    cp ${PATH_TO_TARANTOOL}/commit-author.txt .
 else
     TAR_VER=$(tarantool -v | grep -e "Tarantool" |  grep -oP '\s\K\S*')
     echo ${TAR_VER} | tee version.txt
