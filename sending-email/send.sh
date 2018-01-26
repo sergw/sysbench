@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-if [ ! -n "${EMAIL_LOGIN}" ]; then exit 0; fi
-if [ ! -n "${EMAIL_PASSWORD}" ]; then exit 0; fi
-if [ ! -n "${LAUNCH_TYPE}" ]; then exit 0; fi
+if [ ! -n "${EMAIL_LOGIN}" ]; then exit 1; fi
+if [ ! -n "${EMAIL_PASSWORD}" ]; then exit 1; fi
+if [ ! -n "${LAUNCH_TYPE}" ]; then exit 1; fi
 
 if [ -f "benchmarking/commit-author.txt" ]; then
     EMAIL_RCPT=`cat benchmarking/commit-author.txt`
 else
-    if [ "${LAUNCH_TYPE}" == "MANUAL" ]; then exit 0; fi
+    if [ "${LAUNCH_TYPE}" == "MANUAL" ]; then exit 1; fi
 
     EMAIL_RCPT="${EMAIL_DEFAULT}"
 fi
