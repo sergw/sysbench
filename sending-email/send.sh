@@ -2,32 +2,41 @@
 
 if [ ! -n "${EMAIL_LOGIN}" ]; then exit 0; fi
 if [ ! -n "${EMAIL_PASSWORD}" ]; then exit 0; fi
+if [ ! -n "${LAUNCH_TYPE}" ]; then exit 0; fi
 
 if [ -f "benchmarking/commit-author.txt" ]; then
     EMAIL_RCPT=`cat benchmarking/commit-author.txt`
 else
+    if [ "${LAUNCH_TYPE}" == "MANUAL" ]; then exit 0; fi
+
     EMAIL_RCPT="${EMAIL_DEFAULT}"
 fi
 
 if [ ! -n "${BRANCH}" ]; then BRANCH="1.8"; fi
+VERSION=`cat benchmarking/version.txt`
 
 if [ -n "${SUCCESS_BENCHMARK}" ]; then
-    VERSION=`cat benchmarking/version.txt`
     echo "Subject: [benchmarks] Success $VERSION $BRANCH" > letter.txt
     echo "Hello" >> letter.txt
     cat ./benchmarking/result.txt >> letter.txt
     echo "all results:" >> letter.txt
     echo "http://bench.tarantool.org/?tab=tab-sysbench" >> letter.txt
 else
-    echo "Subject: [benchmarks] Fail $BRANCH" > letter.txt
+    echo "Subject: [benchmarks] Fail $VERSION $BRANCH" > letter.txt
     echo "Hello" >> letter.txt
     echo "Fail benchmark." >> letter.txt
-    echo "----------" >> letter.txt
-    echo "Fail test:" >> letter.txt
-    cat ./benchmarking/last-test.txt >> letter.txt
-    echo "----------" >> letter.txt
-    echo "Tarantool log:" >> letter.txt
-    cat ./benchmarking/sysbench-server.log >> letter.txt
+
+    if [ -f "benchmarking/last-test.txt" ]; then
+        echo "----------" >> letter.txt
+        echo "Fail test:" >> letter.txt
+        cat ./benchmarking/last-test.txt >> letter.txt
+    fi
+
+    if [ -f "benchmarking/sysbench-server.log" ]; then
+        echo "----------" >> letter.txt
+        echo "Tarantool log:" >> letter.txt
+        cat ./benchmarking/sysbench-server.log >> letter.txt
+    fi
 fi
 
 curl --connect-timeout 15 -v \
