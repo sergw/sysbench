@@ -4,12 +4,14 @@ if [ ! -n "${EMAIL_LOGIN}" ]; then exit 1; fi
 if [ ! -n "${EMAIL_PASSWORD}" ]; then exit 1; fi
 if [ ! -n "${LAUNCH_TYPE}" ]; then exit 1; fi
 
-if [ -f "benchmarking/commit-author.txt" ]; then
+if [ "${LAUNCH_TYPE}" == "MANUAL" ]; then
+    if [ ! -f "benchmarking/commit-author.txt" ]; then exit 1; fi
     EMAIL_RCPT=`cat benchmarking/commit-author.txt`
-else
-    if [ "${LAUNCH_TYPE}" == "MANUAL" ]; then exit 1; fi
-
+elif [ "${LAUNCH_TYPE}" == "AUTO" ]; then
+    if [ ! -n "${EMAIL_DEFAULT}" ]; then exit 1; fi
     EMAIL_RCPT="${EMAIL_DEFAULT}"
+else
+    exit 1;
 fi
 
 if [ ! -n "${BRANCH}" ]; then BRANCH="1.8"; fi

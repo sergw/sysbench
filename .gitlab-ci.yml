@@ -1,7 +1,7 @@
 stages:
  - benchmark
- - sending-email-on-success
  - sending-email-on-failure
+ - sending-email-on-success
  - publish
 
 sysbench-benchmark:
@@ -62,6 +62,7 @@ sysbench-publish:
     - cat ./benchmarking/result.txt
     - cat ./benchmarking/version.txt
     - ./publication/main.py ./benchmarking/result.txt ./benchmarking/version.txt
+  when: always
   tags:
     - gitlab-org
   only:
