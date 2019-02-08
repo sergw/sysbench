@@ -73,7 +73,9 @@ sysbench.cmdline.options = {
           "PostgreSQL driver. The only currently supported " ..
           "variant is 'redshift'. When enabled, " ..
           "create_secondary is automatically disabled, and " ..
-          "delete_inserts is set to 0"}
+          "delete_inserts is set to 0"},
+   tarantool_storage_engine =
+      {"Storage engine, if Tarantool is used", "vinyl"}
 }
 
 if (sysbench.sql.driver():name() == "tarantool") then
@@ -86,6 +88,11 @@ end
 function cmd_prepare()
    local drv = sysbench.sql.driver()
    local con = drv:connect()
+
+   if drv:name() == "tarantool" then
+      query = string.format([[pragma sql_default_engine='%s']], sysbench.opt.tarantool_storage_engine)
+      con:query(query)
+   end
 
    for i = sysbench.tid % sysbench.opt.threads + 1, sysbench.opt.tables,
    sysbench.opt.threads do
