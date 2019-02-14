@@ -78,11 +78,6 @@ sysbench.cmdline.options = {
       {"Storage engine, if Tarantool is used", "vinyl"}
 }
 
-if (sysbench.sql.driver():name() == "tarantool") then
-   sysbench.cmdline.options.skip_trx[2] = true
-   sysbench.cmdline.options.secondary[2] = false
-end
-
 -- Prepare the dataset. This command supports parallel execution, i.e. will
 -- benefit from executing with --threads > 1 as long as --tables > 1
 function cmd_prepare()
