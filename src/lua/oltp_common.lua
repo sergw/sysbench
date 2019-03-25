@@ -209,8 +209,8 @@ function create_table(drv, con, table_num)
 CREATE TABLE sbtest%d(
   id %s,
   k INTEGER DEFAULT '0' NOT NULL,
-  c CHAR(120) DEFAULT '' NOT NULL,
-  pad CHAR(60) DEFAULT '' NOT NULL
+  c VARCHAR(120) DEFAULT '' NOT NULL,
+  pad VARCHAR(60) DEFAULT '' NOT NULL
 )]],
          table_num, id_def)
    else
@@ -218,8 +218,8 @@ CREATE TABLE sbtest%d(
 CREATE TABLE sbtest%d(
   id %s,
   k INTEGER DEFAULT '0' NOT NULL,
-  c CHAR(120) DEFAULT '' NOT NULL,
-  pad CHAR(60) DEFAULT '' NOT NULL,
+  c VARCHAR(120) DEFAULT '' NOT NULL,
+  pad VARCHAR(60) DEFAULT '' NOT NULL,
   %s (id)
 ) %s %s]],
          table_num, id_def, id_index_def, engine_def, extra_table_options)
@@ -291,13 +291,13 @@ local stmt_defs = {
       t.INT},
    non_index_updates = {
       "UPDATE sbtest%u SET c=? WHERE id=?",
-      {t.CHAR, 120}, t.INT},
+      {t.VARCHAR, 120}, t.INT},
    deletes = {
       "DELETE FROM sbtest%u WHERE id=?",
       t.INT},
    inserts = {
       "INSERT INTO sbtest%u (id, k, c, pad) VALUES (?, ?, ?, ?)",
-      t.INT, t.INT, {t.CHAR, 120}, {t.CHAR, 60}},
+      t.INT, t.INT, {t.VARCHAR, 120}, {t.VARCHAR, 60}},
 }
 
 function prepare_begin()
